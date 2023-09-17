@@ -1,0 +1,20 @@
+-- root_toogle.lua
+-- defineProperty(bg, {1,1,1,1})
+
+local currentCursor = 53
+local previousCursor
+
+-- sasl.setAuxiliaryClickSystem(true)
+-- sasl.setCSMode (1) 
+
+function draw()
+    drawRectangle(0, 0, 20, 20, get(bg))
+    -- drawText(fnt, 50, 25, last_char, 15, false, false, TEXT_ALIGN_CENTER, {0,0,0,1})
+end
+
+function onMouseDown()
+    show_hide()
+    return true
+end
+
+
