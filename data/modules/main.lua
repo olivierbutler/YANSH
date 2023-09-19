@@ -6,6 +6,7 @@
 require("definitions")
 require("settings")
 qDatas = require("queries")
+require("fmc")
 
 sasl.logInfo(string.format("Starting %s v%s", definitions.APPNAMEPREFIX, definitions.VERSION))
 
@@ -54,10 +55,31 @@ interactive_datapanel = contextWindow {
     }}
 }
 
+local st_height = 200
+local st_width = 700
+local st_x_org = xRoot + (wRoot - st_width)/2
+local st_y_org = yRoot + (hRoot  - st_height)/2
+setup_datapanel = contextWindow {
+    name = "setup_datapanel",
+    position = {st_x_org, st_y_org, st_width, st_height},
+    visible = false,
+    noResize = true,
+    vrAuto = true,
+    noBackground = true,
+    noDecore = true,
+    proportional = true,
+    components = {setup_datapanel {
+        position = {0, 0, st_width, st_height},
+        size = {st_width, st_height}
+    }}
+}
+
+
 interactive_datapanel:setMovable(true)
 
 function show_hide()
     interactive_datapanel:setIsVisible(not interactive_datapanel:isVisible())
+    setup_datapanel:setIsVisible(false)
 end
 
 local status = true
@@ -82,9 +104,11 @@ menu_main = sasl.createMenu("", PLUGINS_MENU_ID, menu_master)
 menu_action = sasl.appendMenuItem(menu_main, "Show/hide " .. definitions.APPNAMEPREFIX, show_hide)
 
 settings.restoreFov()
+fmc.initTailNum()
 
 function onAirportLoaded(flightNumber)
     sasl.logInfo("Starting Flight #" .. flightNumber .. " " .. sasl.getAircraftPath() .. " " .. sasl.getAircraft())
     settings.restoreFov()
+    fmc.initTailNum()
 end
 

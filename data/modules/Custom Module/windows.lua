@@ -80,8 +80,6 @@ end
 blockText definition 
     x = blockText x origin / mandatory
     y = blockText y origin / mandatory
-    w = blockText width / mandatory
-    h = blockText height / mandatory
     bg = button background color / optional ( definitions.buttonColor if omitted)
     acolor = active button text color / optional ( definitions.activeButtonColor if omitted)
     dcolor = disable button text color / optional ( definitions.disableButtonColor if omitted)
@@ -126,6 +124,58 @@ function P.drawBlockTexts(sBlock, sTable)
             y = y - lh
         end
     end
+end
+
+--[[
+checkBox definition 
+    t = checkbox label / mandatory
+    x = checkbox x origin / mandatory
+    y = checkbox y origin / mandatory
+    bg = button background color / optional ( definitions.buttonColor if omitted)
+    acolor = active button text color / optional ( definitions.activeButtonColor if omitted)
+    dcolor = disable button text color / optional ( definitions.disableButtonColor if omitted)
+    lh = blockText line height / optional ( definitions.lineHeight if omitted)
+    font = blockText text font / optional ( definitions.wFont if omitted)
+}
+-- ]]
+function P.drawCheckBox(checkBox, value)
+
+    local bg = checkBox.bg
+    if bg == nil then
+        bg = definitions.buttonColor
+    end
+    local dcolor = checkBox.dcolor
+    if dcolor == nil then
+        dcolor = definitions.disableButtonColor
+    end
+
+    local acolor = checkBox.acolor
+    if acolor == nil then
+        acolor = definitions.textColor
+    end
+
+    local font = checkBox.font
+    if font == nil then
+        font = definitions.wFont
+    end
+
+    local lh = checkBox.lh
+    if lh == nil then
+        lh = definitions.lineHeight
+    end
+    local text_w, text_h = sasl.gl.measureTextI(font, checkBox.t)
+    local org_x_cb = checkBox.x 
+    local org_y_cb = checkBox.y
+    local h_cb = text_h 
+    local w_cb = h_cb
+    
+    sasl.gl.drawFrame(org_x_cb, org_y_cb , w_cb, h_cb, acolor)
+    if toboolean(value) then
+        sasl.gl.drawLine(org_x_cb, org_y_cb, org_x_cb + w_cb, org_y_cb + h_cb, acolor)
+        sasl.gl.drawLine(org_x_cb, org_y_cb + h_cb, org_x_cb + w_cb , org_y_cb , acolor)
+    end 
+
+    sasl.gl.drawTextI(font, checkBox.x + w_cb + 5, checkBox.y, checkBox.t, TEXT_ALIGN_LEFT, acolor)
 end
 
 --[[

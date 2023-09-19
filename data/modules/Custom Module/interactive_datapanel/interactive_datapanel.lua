@@ -3,14 +3,21 @@
 -- Code example for SASL3
 require("definitions")
 require("windows")
+require("fmc")
 
-defineProperty(size, {200,200})
+defineProperty(size, {200, 200})
 
 size = get(size)
 
 wSize = size[1]
 hSize = size[2]
 
+local TTimer = sasl.createTimer()
+local T200msTimer = 50 * 1000 -- 200 ms
+
+if fmc.isZibo then
+    sasl.startTimer(TTimer)
+end
 
 local wTitle = string.format("%s (%s)", definitions.APPNAMEPREFIXLONG, definitions.VERSION)
 if updateAvailable then
@@ -26,29 +33,56 @@ wdef = {
     fetchButton = {
         t = "Fetch OFP",
         x = 10,
-        y = hSize - definitions.bannerHeight - 25,
+        y = hSize - definitions.bannerHeight - 30,
         w = 100,
-        h = definitions.buttonHeight,
+        h = definitions.buttonHeight
     },
     metarButton = {
         t = "Refresh Metar",
         x = 120,
-        y = hSize - definitions.bannerHeight - 25,
+        y = hSize - definitions.bannerHeight - 30,
         w = 120,
-        h = definitions.buttonHeight,
+        h = definitions.buttonHeight
+    },
+    setupButton = {
+        t = "Setup",
+        x = wSize - 120,
+        y = hSize - definitions.bannerHeight - 30,
+        w = 120,
+        h = definitions.buttonHeight
     },
     closeButton = {
         t = "x",
         x = wSize - definitions.closeXWidth,
         y = hSize - definitions.closeXHeight,
         w = definitions.closeXWidth,
-        h = definitions.closeXHeight,
+        h = definitions.closeXHeight
+    },
+    fovMinus = {
+        t = "-",
+        x = 5,
+        y = hSize - definitions.closeXHeight,
+        w = definitions.closeXWidth,
+        h = definitions.closeXHeight
+    },
+    fovPlus = {
+        t = "+",
+        x = 5 + 25 + definitions.closeXWidth,
+        y = hSize - definitions.closeXHeight,
+        w = definitions.closeXWidth,
+        h = definitions.closeXHeight
+    },
+    fovText = {
+        x = 5 + definitions.closeXHeight + 5,
+        y = hSize - definitions.bannerHeight + definitions.linePaddingBottom,
+        w = 0,
+        h = 0
     },
     ofpText = {
         x = 10,
         y = hSize - definitions.bannerHeight - 50,
         w = 0,
-        h = 0,
+        h = 0
     }
 
 }
@@ -62,7 +96,7 @@ components = {interactive {
         end
     end
 }, interactive {
-    position = {wdef.metarButton.x, wdef.metarButton.y, wdef.metarButton.w, wdef.metarButton.h}, -- FetchOFP
+    position = {wdef.metarButton.x, wdef.metarButton.y, wdef.metarButton.w, wdef.metarButton.h}, -- MetarOFP
     cursor = definitions.cursor,
     onMouseDown = function()
         if qDatas.METAR.status ~= 1 and qDatas.OFP.status == 2 then
@@ -75,8 +109,25 @@ components = {interactive {
     onMouseDown = function()
         interactive_datapanel:setIsVisible(false)
     end
+}, interactive {
+    position = {wdef.setupButton.x, wdef.setupButton.y, wdef.setupButton.w, wdef.setupButton.h}, -- Setup button
+    onMouseDown = function()
+        interactive_datapanel:setIsVisible(false)
+        setup_datapanel:setIsVisible(true)
+    end
+}, interactive {
+    position = {wdef.fovPlus.x, wdef.fovPlus.y, wdef.fovPlus.w, wdef.fovPlus.h}, -- Fov + button
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        settings.incFov(1)
+    end
+}, interactive {
+    position = {wdef.fovMinus.x, wdef.fovMinus.y, wdef.fovMinus.w, wdef.fovMinus.h}, -- Fov - button
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        settings.incFov(-1)
+    end
 }}
-
 
 function update()
 
@@ -85,12 +136,26 @@ function update()
     -- There are lots of ways to write this sort of thing.  The important thing is to write it in a way that
     -- you can easily understand later.  (Don't forget comments)
 
+    if fmc.isZibo then
+        if sasl.getElapsedMicroseconds(TTimer) > T200msTimer then
+            sasl.resetTimer(TTimer)
+            sasl.startTimer(TTimer)
+            -- sasl.logInfo("Timer reach " .. T200msTimer .. " uS")
+            fmc.pushKeyToFMC()
+        end
+    end
+
 end
 
 function draw()
 
     windows.drawWindowTemplate(wdef.mainWindow)
     windows.drawButton(wdef.closeButton, true)
+    windows.drawButton(wdef.fovMinus, true)
+    windows.drawButton(wdef.fovPlus, true)
+    windows.drawBlockTexts(wdef.fovText, {settings.getFov()})
+    windows.drawButton(wdef.setupButton, true)
+
     windows.drawButton(wdef.fetchButton, qDatas.OFP.status ~= 1)
     if #qDatas.OFP.output > 1 then -- display Metar button only if OFP is displayed
         windows.drawButton(wdef.metarButton, qDatas.METAR.status ~= 1)

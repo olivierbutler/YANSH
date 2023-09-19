@@ -25,6 +25,8 @@ P.closeXHeight = 25
 P.closeXWidth = P.closeXHeight
 P.bannerHeight = P.closeXHeight
 P.buttonHeight = P.closeXHeight
+P.checkBoxHeight = 15
+P.checkBoxWidth = P.checkBoxHeight
 P.linePaddingBottom = 8
 P.lineHeight = 15
 P.backgroundColor = {1, 1, 1, 1}
@@ -48,3 +50,7 @@ P.cursor = {
 }
 
 return definitions
+
+
+-- laminar/B738/electric/dc_bus1_status
+-- laminar/B738/electric/main_bus

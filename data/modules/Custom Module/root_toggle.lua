@@ -1,11 +1,7 @@
 -- root_toogle.lua
 -- defineProperty(bg, {1,1,1,1})
 
-local currentCursor = 53
-local previousCursor
 
--- sasl.setAuxiliaryClickSystem(true)
--- sasl.setCSMode (1) 
 
 function draw()
     drawRectangle(0, 0, 20, 20, get(bg))

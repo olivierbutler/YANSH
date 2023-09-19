@@ -4,6 +4,7 @@ queries = P -- package name
 require("definitions")
 require("settings")
 require("helpers")
+fmc = require("fmc")
 
 P.OFP = {
     status = 0, -- 0 never set, 1 query in progress, 2 data ready
@@ -137,6 +138,7 @@ local function fetchOFP(inUrl, inFilePath, inIsOk, inError)
         P.fetchMetar(P.OFP.values.OFP.destination.icao_code)
 
         formatOFPDisplay(P.OFP.values.OFP)
+        fmc.uploadToZiboFMC(P.OFP.values.OFP)
     end
     P.OFP.status = 2
 end

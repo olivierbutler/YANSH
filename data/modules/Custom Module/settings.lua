@@ -122,6 +122,16 @@ function P.savFov()
     P.writeSettings(P.appSettings)
 end
 
+function P.incFov(value)
+    local currentFov = math.floor(P.getFov())
+    currentFov = currentFov + value
+    if currentFov >= 10 and currentFov <= 150 then
+        P.setFov(currentFov)
+        P.savFov()
+    end
+
+end
+
 P.appSettings = P.getSettings()
 
 return settings
