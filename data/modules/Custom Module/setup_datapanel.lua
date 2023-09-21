@@ -4,6 +4,7 @@
 require("definitions")
 require("windows")
 require("settings")
+require("messages")
 
 defineProperty(size, {200, 200})
 
@@ -12,7 +13,7 @@ size = get(size)
 wSize = size[1]
 hSize = size[2]
 
-local wTitle = string.format("%s - Setup", definitions.APPNAMEPREFIXLONG)
+local wTitle = string.format("%s - " .. messages.translation['SETUP'], definitions.APPNAMEPREFIXLONG)
 
 wdef = {
     mainWindow = {
@@ -25,30 +26,113 @@ wdef = {
         x = wSize - definitions.closeXWidth,
         y = hSize - definitions.closeXHeight,
         w = definitions.closeXWidth,
-        h = definitions.closeXHeight
+        h = definitions.closeXHeight,
+        withBorder = false
     },
     ziboFmc = {
-        t = "Upload the 737's FMC automaticaly after fetching the OFP (Zibo B737 only)",
-        x = 5,
-        y = hSize - 100,
+        t = messages.translation['UPLINKZIBO'],
+        value = settings.appSettings.upload2FMC,
+        x = 10,
+        y = hSize - 120,
         w = definitions.checkBoxWidth,
-        h = definitions.checkBoxHeight,
+        h = definitions.checkBoxHeight
+    },
+    debugMode = {
+        t = messages.translation['DEBUGMODE'],
+        value = false,
+        x = 10,
+        y = hSize - 150,
+        w = definitions.checkBoxWidth,
+        h = definitions.checkBoxHeight
+    },
+    sbUser = {
+        t = messages.translation['SBUSERNAME'],
+        value = settings.appSettings.sbuser,
+        x = 10,
+        y = hSize - 60,
+        w = 200,
+        h = definitions.lineHeight * 1.5,
+        isFocused = false
+    },
+    sbUserPaste = {
+        t = messages.translation['PASTE'],
+        x = 400,
+        y = hSize - 60,
+        w = 120,
+        h = definitions.buttonHeight
+    },
+    avwxtoken = {
+        t = messages.translation['AVWXTOKEN'],
+        value = string.sub(settings.appSettings.avwxtoken, 1, 5) .. "******",
+        x = 10,
+        y = hSize - 90,
+        w = 200,
+        h = definitions.lineHeight * 1.5,
+        isFocused = false
+    },
+    avwxtokenPaste = {
+        t = messages.translation['PASTE'],
+        x = 400,
+        y = hSize - 90,
+        w = 120,
+        h = definitions.buttonHeight
     }
 }
 
 components = {interactive {
-    position = {wdef.ziboFmc.x, wdef.ziboFmc.y, wdef.ziboFmc.w, wdef.ziboFmc.h}, -- FetchOFP
+    position = {wdef.ziboFmc.x, wdef.ziboFmc.y, wdef.ziboFmc.w, wdef.ziboFmc.h}, -- FMC uplink auto FMC
     cursor = definitions.cursor,
     onMouseDown = function()
-       settings.appSettings.upload2FMC = not settings.appSettings.upload2FMC
-       settings.writeSettings(settings.appSettings)
+        settings.appSettings.upload2FMC = not settings.appSettings.upload2FMC
+        settings.writeSettings(settings.appSettings)
+        wdef.ziboFmc.value = settings.appSettings.upload2FMC
+    end
+},interactive {
+    position = {wdef.debugMode.x, wdef.debugMode.y, wdef.debugMode.w, wdef.debugMode.h}, -- Debug Mode
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        wdef.debugMode.value = not wdef.debugMode.value
+        if wdef.debugMode.value then 
+            sasl.setLogLevel(LOG_DEBUG)
+            sasl.logDebug("log mode set to DEBUG")
+        else
+            sasl.setLogLevel(LOG_INFO)
+            sasl.logInfo("log mode set to INFO")
+        end
     end
 }, interactive {
     position = {wdef.closeButton.x, wdef.closeButton.y, wdef.closeButton.w, wdef.closeButton.h}, -- Close the window
+    cursor = definitions.cursor,
     onMouseDown = function()
         interactive_datapanel:setIsVisible(true)
         setup_datapanel:setIsVisible(false)
     end
+}, interactive {
+    position = {wdef.sbUserPaste.x, wdef.sbUserPaste.y, wdef.sbUserPaste.w, wdef.sbUserPaste.h}, -- simbrief user field paste button
+    cursor = definitions.cursor,
+    onMouseDown = function(component, x, y, button, parentX, parentY)
+        local paste = sasl.getClipboardText()
+        if paste ~= nil and paste ~= "" then
+            sasl.logDebug(string.format("Paste Sb UserName %s", paste))
+            wdef.sbUser.value = paste
+            settings.appSettings.sbuser = paste
+            settings.writeSettings(settings.appSettings)
+        end
+    end
+
+}, interactive {
+    position = {wdef.avwxtokenPaste.x, wdef.avwxtokenPaste.y, wdef.avwxtokenPaste.w, wdef.avwxtokenPaste.h}, -- simbrief user field paste button
+    cursor = definitions.cursor,
+    onMouseDown = function(component, x, y, button, parentX, parentY)
+        local paste = sasl.getClipboardText()
+        if paste ~= nil and paste ~= "" then
+            sasl.logDebug(string.format("Paste Awvx Token %s", paste))
+            wdef.avwxtoken.value = string.sub(paste, 1, 5) .. "******"
+            settings.appSettings.avwxtoken = paste
+            settings.writeSettings(settings.appSettings)
+        end
+    end
+
 }}
 
 function update()
@@ -64,8 +148,14 @@ function draw()
 
     windows.drawWindowTemplate(wdef.mainWindow)
     windows.drawButton(wdef.closeButton, true)
+    windows.drawButton(wdef.sbUserPaste, true)
+    windows.drawButton(wdef.avwxtokenPaste, true)
 
-    windows.drawCheckBox(wdef.ziboFmc, settings.appSettings.upload2FMC)
+    windows.inputTextBox(wdef.sbUser)
+    windows.inputTextBox(wdef.avwxtoken)
+
+    windows.drawCheckBox(wdef.ziboFmc)
+    windows.drawCheckBox(wdef.debugMode)
 
     drawAll(components) -- This line is not always necessary for drawing, but if you want to see your click zones, in X-Plane 
     -- include it at the end of your draw function	

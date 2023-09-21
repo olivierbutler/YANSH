@@ -7,22 +7,32 @@ P.fmcKeyQueue = {}
 P.fmcQueueLocked = false
 local fmcKeyWait = 0
 
-local p_fov = globalProperty("laminar/B738/electric/main_bus")
+local p_fov = globalProperty("sim/graphics/view/field_of_view_deg")
 local acf_tailnum = globalProperty("sim/aircraft/view/acf_tailnum")
 local ground_speed = globalProperty("sim/flightmodel/position/groundspeed")
-local main_bus = globalProperty("laminar/B738/electric/main_bus")
+local main_bus = nil
+local main_battery = nil
 
 function P.isOnGround()
     return (get(ground_speed) < 5)
 end
 
 function P.isFMConPower()
-    return (get(main_bus) > 0)
+    if main_battery == nil or main_bus == nil then
+        return false
+    end
+    return (get(main_bus) > 0) and (get(main_battery) > 0)
 end
 
 function P.initTailNum()
     P.isZibo = (string.sub(get(acf_tailnum), 1, 5) == "ZB738")
-    sasl.logInfo("is zibo ->" .. string.sub(get(acf_tailnum), 1, 5) .. "<--")
+    if P.isZibo then
+        sasl.logDebug("is zibo YES ->" .. string.sub(get(acf_tailnum), 1, 5) .. "<-")
+        main_bus = globalProperty("laminar/B738/electric/main_bus")
+        main_battery = globalProperty("laminar/B738/electric/battery_pos")
+    else 
+        sasl.logDebug("is zibo -> NO" )
+    end
 end
 
 function P.pushKeyToFMC()
@@ -35,12 +45,12 @@ function P.pushKeyToFMC()
             local b = table.remove(P.fmcKeyQueue, 1)
             if b == '_WAIT_' then
                 fmcKeyWait = 15
-                sasl.logInfo(b)
+                sasl.logDebug(b)
                 return
             end
             local viewOutsideCommand = sasl.findCommand(b)
             sasl.commandOnce(viewOutsideCommand)
-            sasl.logInfo(b)
+            sasl.logDebug(b)
         end
     end
 end
@@ -92,12 +102,10 @@ function P.uploadToZiboFMC(ofpData)
             return 
         end
         -- find TOC
-        local iTOC = 1
-        while ofpData.navlog.fix[iTOC].ident ~= "TOC" do
-            iTOC = iTOC + 1
-        end
+        local iTOC = ofpData.iTOC
+        
 
-        sasl.logInfo("uploadToZiboFMC")
+        sasl.logInfo("Zibo B737 status ok : computing the FMC")
         P.fmcQueueLocked = true
         pushKeyToBuffer("rte", ofpData.origin.icao_code .. ofpData.destination.icao_code .. definitions.OFPSUFFIX, "2L")
         pushKeyToBuffer("", ofpData.origin.plan_rwy, "3L")

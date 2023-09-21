@@ -3,33 +3,30 @@ settings = P -- package name
 
 require("definitions")
 
-local settingPath = definitions.XPOUTPUTPATH .. "preferences" .. definitions.OSSEPARATOR .. definitions.APPNAMEPREFIX ..
-                        ".prf"
+local settingPath = definitions.XPOUTPUTPATH .. "preferences" .. definitions.OSSEPARATOR .. definitions.APPNAMEPREFIX .. ".prf"
 local settingFormat = 'ini'
-local settingLegacyPath = definitions.XPRESSOURCESPATH .. "plugins" .. definitions.OSSEPARATOR .. "FlyWithLua" ..
-                              definitions.OSSEPARATOR .. "Scripts" .. definitions.OSSEPARATOR .. "simbrief_helper.ini"
+local settingLegacyPath = definitions.XPRESSOURCESPATH .. "plugins" .. definitions.OSSEPARATOR .. "FlyWithLua" .. definitions.OSSEPARATOR .. "Scripts" .. definitions.OSSEPARATOR ..
+                              "simbrief_helper.ini"
 local settingLegacyFormat = 'ini'
 
 local defaultSetting = {
     sbuser = "",
     avwxtoken = "",
     upload2FMC = false,
-    fov = {}
+    fov = {},
 }
 
 local p_fov = globalProperty("sim/graphics/view/field_of_view_deg")
 
 local function migrateFovSettings(currentSettings)
-    local fovPath = definitions.XPRESSOURCESPATH .. "plugins" .. definitions.OSSEPARATOR .. "FlyWithLua" ..
-                        definitions.OSSEPARATOR .. "Scripts" .. definitions.OSSEPARATOR
+    local fovPath = definitions.XPRESSOURCESPATH .. "plugins" .. definitions.OSSEPARATOR .. "FlyWithLua" .. definitions.OSSEPARATOR .. "Scripts" .. definitions.OSSEPARATOR
     local contents = sasl.listFiles(fovPath)
     local fov_value = nil
     currentSettings.fov = {}
     if #contents > 0 then
         for i = 1, #contents do
             local currentName = contents[i].name
-            if contents[i].type == 'file' and string.find(currentName, "fov_keeper_") ~= nil and
-                string.find(currentName, ".ini") ~= nil then
+            if contents[i].type == 'file' and string.find(currentName, "fov_keeper_") ~= nil and string.find(currentName, ".ini") ~= nil then
                 currentName = string.gsub(currentName, "fov_keeper_", "")
                 currentName = string.gsub(currentName, ".ini", "")
                 local file = io.open(fovPath .. contents[i].name, "r")
@@ -105,13 +102,15 @@ end
 function P.restoreFov()
     if P.appSettings.fov ~= nil then
         local my_aircraft = string.gsub(sasl.getAircraft(), ".acf", "")
-        local newFov = P.appSettings.fov[my_aircraft]
-        if newFov ~= nil then
-            sasl.logInfo(string.format("Restoring Fov %s for aircraft %s", newFov, my_aircraft))
-            settings.setFov(newFov)
-        else 
-            sasl.logInfo(string.format("Saving Fov %s for aircraft %s", P.getFov(), my_aircraft))
-            P.savFov()
+        if #my_aircraft > 0 then
+            local newFov = P.appSettings.fov[my_aircraft]
+            if newFov ~= nil then
+                sasl.logInfo(string.format("Restoring Fov %s for aircraft %s", newFov, my_aircraft))
+                settings.setFov(newFov)
+            else
+                sasl.logInfo(string.format("Saving Fov %s for aircraft %s", P.getFov(), my_aircraft))
+                P.savFov()
+            end
         end
     end
 end

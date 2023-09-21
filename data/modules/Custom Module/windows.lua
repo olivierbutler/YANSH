@@ -36,6 +36,7 @@ button definition
     dcolor = disable button text color / optional ( definitions.disableButtonColor if omitted)
     linePadding = button text bottom padding color / optional ( definitions.linePaddingBottom if omitted)
     font = button text font / optional ( definitions.wFont if omitted)
+    withBorder = button border true/false flag / optional ( true if omitted)
 }
 -- ]]
 function P.drawButton(button, active)
@@ -72,7 +73,15 @@ function P.drawButton(button, active)
         color = acolor
     end
 
+    local border = button.withBorder
+    if border == nil then
+        border = true
+    end
+
     drawRectangle(button.x, button.y, button.w, button.h, bg)
+    if border then
+        sasl.gl.drawFrame(button.x, button.y, button.w, button.h, color)
+    end
     sasl.gl.drawTextI(font, button.x + button.w / 2, button.y + linePadding, t, TEXT_ALIGN_CENTER, color)
 end
 
@@ -131,6 +140,7 @@ checkBox definition
     t = checkbox label / mandatory
     x = checkbox x origin / mandatory
     y = checkbox y origin / mandatory
+    value = inputText value / mandatory
     bg = button background color / optional ( definitions.buttonColor if omitted)
     acolor = active button text color / optional ( definitions.activeButtonColor if omitted)
     dcolor = disable button text color / optional ( definitions.disableButtonColor if omitted)
@@ -138,7 +148,7 @@ checkBox definition
     font = blockText text font / optional ( definitions.wFont if omitted)
 }
 -- ]]
-function P.drawCheckBox(checkBox, value)
+function P.drawCheckBox(checkBox)
 
     local bg = checkBox.bg
     if bg == nil then
@@ -164,18 +174,79 @@ function P.drawCheckBox(checkBox, value)
         lh = definitions.lineHeight
     end
     local text_w, text_h = sasl.gl.measureTextI(font, checkBox.t)
-    local org_x_cb = checkBox.x 
+    local org_x_cb = checkBox.x
     local org_y_cb = checkBox.y
-    local h_cb = text_h 
+    local h_cb = text_h
     local w_cb = h_cb
-    
-    sasl.gl.drawFrame(org_x_cb, org_y_cb , w_cb, h_cb, acolor)
-    if toboolean(value) then
-        sasl.gl.drawLine(org_x_cb, org_y_cb, org_x_cb + w_cb, org_y_cb + h_cb, acolor)
-        sasl.gl.drawLine(org_x_cb, org_y_cb + h_cb, org_x_cb + w_cb , org_y_cb , acolor)
-    end 
 
-    sasl.gl.drawTextI(font, checkBox.x + w_cb + 5, checkBox.y, checkBox.t, TEXT_ALIGN_LEFT, acolor)
+    sasl.gl.drawFrame(org_x_cb, org_y_cb, w_cb, h_cb, acolor)
+    if toboolean(checkBox.value) then
+        sasl.gl.drawLine(org_x_cb, org_y_cb, org_x_cb + w_cb, org_y_cb + h_cb, acolor)
+        sasl.gl.drawLine(org_x_cb, org_y_cb + h_cb, org_x_cb + w_cb, org_y_cb, acolor)
+    end
+
+    sasl.gl.drawTextI(font, checkBox.x + w_cb + 10, checkBox.y, checkBox.t, TEXT_ALIGN_LEFT, acolor)
+end
+
+--[[
+inputText definition 
+    t = inputText label / mandatory
+    x = inputText x origin / mandatory
+    y = inputText y origin / mandatory
+    w = button width / mandatory
+    h = button height / mandatory
+    isFocused = has testInput focus / mandatory,
+    value = inputText value / mandatory
+    bg = button background color / optional ( definitions.buttonColor if omitted)
+    acolor = active button text color / optional ( definitions.activeButtonColor if omitted)
+    dcolor = disable button text color / optional ( definitions.disableButtonColor if omitted)
+    lh = blockText line height / optional ( definitions.lineHeight if omitted)
+    font = blockText text font / optional ( definitions.wFont if omitted)
+}
+-- ]]
+function P.inputTextBox(inputText)
+
+    local bg = inputText.bg
+    if bg == nil then
+        bg = definitions.inputBackgroundColor
+    end
+    local dcolor = inputText.dcolor
+    if dcolor == nil then
+        dcolor = definitions.disableInputText
+    end
+
+    local acolor = inputText.acolor
+    if acolor == nil then
+        acolor = definitions.activeInputText
+    end
+
+    local font = inputText.font
+    if font == nil then
+        font = definitions.wFont
+    end
+
+    local lh = inputText.lh
+    if lh == nil then
+        lh = definitions.lineHeight
+    end
+
+    local text_h = inputText.h
+    local text_w = inputText.w
+    local org_x_cb = inputText.x
+    local org_y_cb = inputText.y
+
+
+    local color = dcolor
+
+    sasl.gl.drawRectangle(org_x_cb, org_y_cb, text_w, text_h, bg)
+    if inputText.isFocused then
+        sasl.gl.drawFrame(org_x_cb, org_y_cb, text_w, text_h, definitions.activeInputText)
+        color = acolor
+       -- sasl.gl.drawLine(org_x_cb, org_y_cb, org_x_cb + w_cb, org_y_cb + h_cb, acolor)
+       -- sasl.gl.drawLine(org_x_cb, org_y_cb + h_cb, org_x_cb + w_cb, org_y_cb, acolor)
+    end
+    sasl.gl.drawTextI(font, inputText.x + 5 , inputText.y + definitions.linePaddingBottom , inputText.value, TEXT_ALIGN_LEFT, color)
+    sasl.gl.drawTextI(font, inputText.x + text_w + 10, inputText.y + definitions.linePaddingBottom, inputText.t, TEXT_ALIGN_LEFT, acolor)
 end
 
 --[[

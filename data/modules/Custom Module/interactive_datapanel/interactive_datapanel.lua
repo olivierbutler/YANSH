@@ -4,6 +4,7 @@
 require("definitions")
 require("windows")
 require("fmc")
+require("messages")
 
 defineProperty(size, {200, 200})
 
@@ -21,7 +22,7 @@ end
 
 local wTitle = string.format("%s (%s)", definitions.APPNAMEPREFIXLONG, definitions.VERSION)
 if updateAvailable then
-    wTitle = wTitle .. " update available v" .. newVersion
+    wTitle = wTitle .. " " .. messages.translation['UPDATEAVAILABLE'] .. " v" .. newVersion
 end
 
 wdef = {
@@ -33,21 +34,28 @@ wdef = {
     fetchButton = {
         t = "Fetch OFP",
         x = 10,
-        y = hSize - definitions.bannerHeight - 30,
+        y = hSize - definitions.bannerHeight - 40,
         w = 100,
         h = definitions.buttonHeight
     },
     metarButton = {
         t = "Refresh Metar",
         x = 120,
-        y = hSize - definitions.bannerHeight - 30,
+        y = hSize - definitions.bannerHeight - 40,
+        w = 120,
+        h = definitions.buttonHeight
+    },
+    uplinkFMC = {
+        t = "uplink to FMC",
+        x = 330,
+        y = hSize - definitions.bannerHeight - 40,
         w = 120,
         h = definitions.buttonHeight
     },
     setupButton = {
-        t = "Setup",
-        x = wSize - 120,
-        y = hSize - definitions.bannerHeight - 30,
+        t = messages.translation['SETUP'],
+        x = wSize - 130,
+        y = hSize - definitions.bannerHeight - 40,
         w = 120,
         h = definitions.buttonHeight
     },
@@ -56,21 +64,24 @@ wdef = {
         x = wSize - definitions.closeXWidth,
         y = hSize - definitions.closeXHeight,
         w = definitions.closeXWidth,
-        h = definitions.closeXHeight
+        h = definitions.closeXHeight,
+        withBorder = false
     },
     fovMinus = {
         t = "-",
         x = 5,
         y = hSize - definitions.closeXHeight,
         w = definitions.closeXWidth,
-        h = definitions.closeXHeight
+        h = definitions.closeXHeight,
+        withBorder = false
     },
     fovPlus = {
         t = "+",
         x = 5 + 25 + definitions.closeXWidth,
         y = hSize - definitions.closeXHeight,
         w = definitions.closeXWidth,
-        h = definitions.closeXHeight
+        h = definitions.closeXHeight,
+        withBorder = false
     },
     fovText = {
         x = 5 + definitions.closeXHeight + 5,
@@ -80,7 +91,7 @@ wdef = {
     },
     ofpText = {
         x = 10,
-        y = hSize - definitions.bannerHeight - 50,
+        y = hSize - definitions.bannerHeight - 70,
         w = 0,
         h = 0
     }
@@ -95,22 +106,35 @@ components = {interactive {
             qDatas.fechOFP()
         end
     end
-}, interactive {
+},
+interactive {
+    position = {wdef.uplinkFMC.x, wdef.uplinkFMC.y, wdef.uplinkFMC.w, wdef.uplinkFMC.h}, -- uplinkFMC
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        if fmc.isOnGround() and fmc.isFMConPower() and (#fmc.fmcKeyQueue == 0) then
+            fmc.uploadToZiboFMC(qDatas.OFP.values.OFP)
+        end
+    end,
+
+},
+ interactive {
     position = {wdef.metarButton.x, wdef.metarButton.y, wdef.metarButton.w, wdef.metarButton.h}, -- MetarOFP
     cursor = definitions.cursor,
     onMouseDown = function()
-        if qDatas.METAR.status ~= 1 and qDatas.OFP.status == 2 then
+        if qDatas.METAR.status ~= 1 and qDatas.OFP.status == 2 and #settings.appSettings.avwxtoken then
             qDatas.fetchMetar(qDatas.OFP.values.OFP.origin.icao_code)
             qDatas.fetchMetar(qDatas.OFP.values.OFP.destination.icao_code)
         end
     end
 }, interactive {
     position = {wdef.closeButton.x, wdef.closeButton.y, wdef.closeButton.w, wdef.closeButton.h}, -- Close the window
+    cursor = definitions.cursor,
     onMouseDown = function()
         interactive_datapanel:setIsVisible(false)
     end
 }, interactive {
     position = {wdef.setupButton.x, wdef.setupButton.y, wdef.setupButton.w, wdef.setupButton.h}, -- Setup button
+    cursor = definitions.cursor,
     onMouseDown = function()
         interactive_datapanel:setIsVisible(false)
         setup_datapanel:setIsVisible(true)
@@ -156,9 +180,18 @@ function draw()
     windows.drawBlockTexts(wdef.fovText, {settings.getFov()})
     windows.drawButton(wdef.setupButton, true)
 
-    windows.drawButton(wdef.fetchButton, qDatas.OFP.status ~= 1)
-    if #qDatas.OFP.output > 1 then -- display Metar button only if OFP is displayed
+    windows.drawButton(wdef.fetchButton, qDatas.OFP.status ~= 1 and #settings.appSettings.sbuser)
+    if #settings.appSettings.sbuser == 0 then 
+        windows.drawBlockTexts(wdef.ofpText, {messages.translation['NOUSERNAME']})
+    else 
+        windows.drawBlockTexts(wdef.ofpText, qDatas.OFP.output) 
+    end        
+    if #qDatas.OFP.output > 1 and #settings.appSettings.avwxtoken then -- display Metar button only if OFP is displayed and avwxtoken defined
         windows.drawButton(wdef.metarButton, qDatas.METAR.status ~= 1)
+
+        if fmc.isZibo then
+            windows.drawButton(wdef.uplinkFMC, fmc.isOnGround() and fmc.isFMConPower() and (#fmc.fmcKeyQueue == 0))
+        end
     end
     windows.drawBlockTexts(wdef.ofpText, qDatas.OFP.output)
 
