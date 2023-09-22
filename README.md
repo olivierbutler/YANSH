@@ -57,7 +57,7 @@ Just uncompress YANSH_3.x.zip file in your Resources/plugins folder.
 - Recommanded : remove the simbrief_helper.lua file from the "XPFOLDER"/Resources/plugins/FlyWithLua/Scripts folder
 
 #### Help?
-https://forums.x-plane.org/index.php?/forums/topic/201318-simbrief-helper-enh/
+https://forums.x-plane.org/index.php?/files/file/86783-yansh-yet-another-simbrief-helper/
 
 
 #### Credits
