@@ -24,8 +24,8 @@ This plugins upload Simbrief OFP to Zibo's B738 FMC (formely Simbrief Helper Enh
     
 3. YANSH displays updated METAR along your flight.
     - go to https://avwx.rest and register for free
-    - set you own API token at the page https://account.avwx.rest/tokens
-    - then pasrte in the YANSH's setup window
+    - get you own API token at the page https://account.avwx.rest/tokens
+    - then paste in the YANSH's setup window
     - At any time METARs can be updated by clicking on the "Refresh Metar" button
 
 4. Field of View angle keeper

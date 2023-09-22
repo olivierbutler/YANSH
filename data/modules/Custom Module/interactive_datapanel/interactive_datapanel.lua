@@ -15,8 +15,7 @@ hSize = size[2]
 
 local TTimer = sasl.createTimer()
 local T200msTimer = 50 * 1000 -- 200 ms
-
-
+sasl.startTimer(TTimer) 
 local wTitle = string.format("%s (%s)", definitions.APPNAMEPREFIXLONG, definitions.VERSION)
 if updateAvailable then
     wTitle = wTitle .. " " .. messages.translation['UPDATEAVAILABLE'] .. " v" .. newVersion
@@ -109,7 +108,6 @@ interactive {
     cursor = definitions.cursor,
     onMouseDown = function()
         if fmc.isOnGround() and fmc.isFMConPower() and (#fmc.fmcKeyQueue == 0) then
-            sasl.startTimer(TTimer) -- start timer here , not efficient at load time of this module
             fmc.uploadToZiboFMC(qDatas.OFP.values.OFP)
         end
     end,
@@ -158,11 +156,12 @@ function update()
     -- There are lots of ways to write this sort of thing.  The important thing is to write it in a way that
     -- you can easily understand later.  (Don't forget comments)
 
+ --   fmc.initTailNum()
     if fmc.isZibo then
         if sasl.getElapsedMicroseconds(TTimer) > T200msTimer then
             sasl.resetTimer(TTimer)
             sasl.startTimer(TTimer)
-            -- sasl.logDebug("Timer reach " .. T200msTimer .. " uS")
+            sasl.logDebug("Timer reach " .. T200msTimer .. " uS")
             fmc.pushKeyToFMC()
         end
     end
