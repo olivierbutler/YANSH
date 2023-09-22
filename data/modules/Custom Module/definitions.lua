@@ -15,7 +15,7 @@ end
 P.XPOUTPUTPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Output" .. P.OSSEPARATOR
 P.XPFMSPATH = P.XPOUTPUTPATH .. "FMS plans" .. P.OSSEPARATOR
 P.XPRESSOURCESPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Resources" .. P.OSSEPARATOR
-P.GITHUBURL = "https://raw.githubusercontent.com/olivierbutler/simbriefHelperEnh/main/version.ini"
+P.GITHUBURL = "https://raw.githubusercontent.com/olivierbutler/YANSH/main/data/modules/configuration/version.ini" 
 P.SIMBRIEFURL = "https://www.simbrief.com/api/xml.fetcher.php?username=%s"
 P.SIMBRIEFOFPURL = "https://www.simbrief.com/system/briefing.fmsdl.php?formatget=flightplans/"
 P.AWVXURL = "https://avwx.rest/api/metar/%s?token=%s&reporting=false&format=xml&filter=raw"

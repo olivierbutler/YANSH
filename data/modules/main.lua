@@ -26,7 +26,7 @@ local winRoot = contextWindow {
     noMove = true,
     components = {root_toggle {
         position = {0, 0, 20, 20},
-        bg = {0, 0, 0, 0.5},
+        bg = {0, 0, 0, 0.4},
         cursor = definitions.cursor
     }}
 }
@@ -38,7 +38,7 @@ local dp_y_org = yRoot + 50 -- + hRoot  - dp_height
 interactive_datapanel = contextWindow {
     name = "main window",
     position = {dp_x_org, dp_y_org, dp_width, dp_height},
-    visible = true,
+    visible = false,
     noResize = true,
     vrAuto = true,
     noBackground = true,

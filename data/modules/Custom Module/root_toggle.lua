@@ -8,9 +8,9 @@ function draw()
     -- drawText(fnt, 50, 25, last_char, 15, false, false, TEXT_ALIGN_CENTER, {0,0,0,1})
 end
 
-function onMouseDown()
+function onMouseDown(component , x, y, button , parentX , parentY)
+    if button == MB_RIGHT then
     show_hide()
+    end
     return true
 end
-
-
