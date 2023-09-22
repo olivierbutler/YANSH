@@ -1,5 +1,5 @@
 # YANSH Yet ANother Simbrief Helper
-This plugins upload Simbrief OFP to Zibo's B738 FMC
+This plugins upload Simbrief OFP to Zibo's B738 FMC (formely Simbrief Helper Enh lua script)
 
 ### what new ?
 1. the simbrief flight plan files ( .fms and .xml) are also
@@ -53,7 +53,7 @@ The latest version of Xp11 or Xp12 ( Windows, Mac/Intel/Arm, Linux).
 Just uncompress YANSH_3.x.zip file in your Resources/plugins folder.
 
 #### Migration from Simbrief Helper Enh
-- Existing Simbrief Help Enh setting settings will be automaticaly migrate to YANSH
+- Existing Simbrief Help Enh settings will be automaticaly migrated to YANSH
 - Recommanded : remove the simbrief_helper.lua file from the "XPFOLDER"/Resources/plugins/FlyWithLua/Scripts folder
 
 #### Help?
@@ -65,6 +65,6 @@ https://forums.x-plane.org/index.php?/forums/topic/201318-simbrief-helper-enh/
 2. xml2lua module by Manoel Campos (https://github.com/manoelcampos/xml2lua)
 
 #### History
-- 3.0 Change from lua script to SASL plugin
+- 3.0 Change name to YANSH from Simbrief Helper Enh, change from lua script to SASL plugin
 - 2.2 Update modules to latest version of xml2Lua and improve logging
 - 2.1 Add automatic FMC programing

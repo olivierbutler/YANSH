@@ -16,9 +16,6 @@ hSize = size[2]
 local TTimer = sasl.createTimer()
 local T200msTimer = 50 * 1000 -- 200 ms
 
-if fmc.isZibo then
-    sasl.startTimer(TTimer)
-end
 
 local wTitle = string.format("%s (%s)", definitions.APPNAMEPREFIXLONG, definitions.VERSION)
 if updateAvailable then
@@ -112,6 +109,7 @@ interactive {
     cursor = definitions.cursor,
     onMouseDown = function()
         if fmc.isOnGround() and fmc.isFMConPower() and (#fmc.fmcKeyQueue == 0) then
+            sasl.startTimer(TTimer) -- start timer here , not efficient at load time of this module
             fmc.uploadToZiboFMC(qDatas.OFP.values.OFP)
         end
     end,
@@ -164,7 +162,7 @@ function update()
         if sasl.getElapsedMicroseconds(TTimer) > T200msTimer then
             sasl.resetTimer(TTimer)
             sasl.startTimer(TTimer)
-            -- sasl.logInfo("Timer reach " .. T200msTimer .. " uS")
+            -- sasl.logDebug("Timer reach " .. T200msTimer .. " uS")
             fmc.pushKeyToFMC()
         end
     end

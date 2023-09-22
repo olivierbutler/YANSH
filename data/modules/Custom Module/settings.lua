@@ -4,7 +4,7 @@ settings = P -- package name
 require("definitions")
 
 local settingPath = definitions.XPOUTPUTPATH .. "preferences" .. definitions.OSSEPARATOR .. definitions.APPNAMEPREFIX .. ".prf"
-local settingFormat = 'ini'
+local settingFormat = 'info'
 local settingLegacyPath = definitions.XPRESSOURCESPATH .. "plugins" .. definitions.OSSEPARATOR .. "FlyWithLua" .. definitions.OSSEPARATOR .. "Scripts" .. definitions.OSSEPARATOR ..
                               "simbrief_helper.ini"
 local settingLegacyFormat = 'ini'
@@ -13,7 +13,7 @@ local defaultSetting = {
     sbuser = "",
     avwxtoken = "",
     upload2FMC = false,
-    fov = {},
+    acf = {},
 }
 
 local p_fov = globalProperty("sim/graphics/view/field_of_view_deg")
@@ -22,7 +22,7 @@ local function migrateFovSettings(currentSettings)
     local fovPath = definitions.XPRESSOURCESPATH .. "plugins" .. definitions.OSSEPARATOR .. "FlyWithLua" .. definitions.OSSEPARATOR .. "Scripts" .. definitions.OSSEPARATOR
     local contents = sasl.listFiles(fovPath)
     local fov_value = nil
-    currentSettings.fov = {}
+    -- currentSettings.acf = {}
     if #contents > 0 then
         for i = 1, #contents do
             local currentName = contents[i].name
@@ -32,7 +32,8 @@ local function migrateFovSettings(currentSettings)
                 local file = io.open(fovPath .. contents[i].name, "r")
                 io.input(file)
                 fov_value = io.read()
-                currentSettings.fov[currentName] = fov_value
+                currentSettings.acf[currentName] = {}
+                currentSettings.acf[currentName].fov = fov_value
                 io.close(file)
             end
         end
@@ -100,10 +101,10 @@ function P.setFov(newFov)
 end
 
 function P.restoreFov()
-    if P.appSettings.fov ~= nil then
+    if P.appSettings.acf ~= nil then
         local my_aircraft = string.gsub(sasl.getAircraft(), ".acf", "")
         if #my_aircraft > 0 then
-            local newFov = P.appSettings.fov[my_aircraft]
+            local newFov = P.appSettings.acf[my_aircraft].fov
             if newFov ~= nil then
                 sasl.logInfo(string.format("Restoring Fov %s for aircraft %s", newFov, my_aircraft))
                 settings.setFov(newFov)
@@ -117,7 +118,7 @@ end
 
 function P.savFov()
     local my_aircraft = string.gsub(sasl.getAircraft(), ".acf", "")
-    P.appSettings.fov[my_aircraft] = settings.getFov()
+    P.appSettings.acf[my_aircraft].fov = settings.getFov()
     P.writeSettings(P.appSettings)
 end
 
