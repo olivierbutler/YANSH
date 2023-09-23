@@ -210,7 +210,7 @@ end
 
 function P.fetchMetar(airport)
     local token = settings.appSettings.avwxtoken
-    if string.len(airport) and string.len(token) then
+    if string.len(airport) > 0 and string.len(token) > 0 then
         local url = string.format(definitions.AWVXURL, airport, token)
         P.METAR.status = 1
         P.METAR.values[airport] = nil

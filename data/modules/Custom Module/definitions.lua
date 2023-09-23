@@ -2,7 +2,8 @@ local P = {}
 definitions = P -- package name
 
 -- P.VERSION = "2.2" -- initial version
-P.VERSION = "3.0"
+-- P.VERSION = "3.0" -- fix setup file issue
+P.VERSION = "3.1"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW

@@ -63,7 +63,7 @@ wdef = {
     },
     avwxtoken = {
         t = messages.translation['AVWXTOKEN'],
-        value = string.sub(settings.appSettings.avwxtoken, 1, 5) .. "******",
+        value =  string.sub(settings.appSettings.avwxtoken, 1, 5) .. "******",
         x = 10,
         y = hSize - 90,
         w = 200,

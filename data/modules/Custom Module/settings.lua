@@ -89,25 +89,33 @@ function P.getSettings()
     if lSettings == nil then
         P.writeSettings(currentSetting)
     end
+
+    -- some init are not done well
+    if #currentSetting.sbuser == 0 then 
+        currentSetting.sbuser = ""
+    end    
+    if #currentSetting.avwxtoken == 0 then 
+        currentSetting.avwxtoken = ""
+    end    
     return currentSetting
 end
 
 function P.getFov()
-    return get(p_fov)
+    return math.floor(get(p_fov))
 end
 
 function P.setFov(newFov)
-    set(p_fov, newFov)
+    set(p_fov, math.floor(newFov))
 end
 
 function P.restoreFov()
     if P.appSettings.acf ~= nil then
         local my_aircraft = string.gsub(sasl.getAircraft(), ".acf", "")
         if #my_aircraft > 0 then
-            local newFov = P.appSettings.acf[my_aircraft].fov
+            local newFov = P.appSettings.acf[my_aircraft]
             if newFov ~= nil then
-                sasl.logInfo(string.format("Restoring Fov %s for aircraft %s", newFov, my_aircraft))
-                settings.setFov(newFov)
+                sasl.logInfo(string.format("Restoring Fov %s for aircraft %s", newFov.fov, my_aircraft))
+                P.setFov(newFov.fov)
             else
                 sasl.logInfo(string.format("Saving Fov %s for aircraft %s", P.getFov(), my_aircraft))
                 P.savFov()
@@ -118,7 +126,10 @@ end
 
 function P.savFov()
     local my_aircraft = string.gsub(sasl.getAircraft(), ".acf", "")
-    P.appSettings.acf[my_aircraft].fov = settings.getFov()
+    if P.appSettings.acf[my_aircraft] == nil then 
+        P.appSettings.acf[my_aircraft] = {}
+    end
+    P.appSettings.acf[my_aircraft].fov = P.getFov()
     P.writeSettings(P.appSettings)
 end
 
