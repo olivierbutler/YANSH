@@ -52,6 +52,10 @@ The latest version of Xp11 or Xp12 ( Windows, Mac/Intel/Arm, Linux).
 #### Installation
 Just uncompress YANSH_3.x.zip file in your Resources/plugins folder.
 
+#### Upgrade
+Remove the previous YANSH folder from the Resources/plugins folder.
+Proceed to the installation step
+
 #### Migration from Simbrief Helper Enh
 - Existing Simbrief Help Enh settings will be automaticaly migrated to YANSH
 - Recommanded : remove the simbrief_helper.lua file from the "XPFOLDER"/Resources/plugins/FlyWithLua/Scripts folder
