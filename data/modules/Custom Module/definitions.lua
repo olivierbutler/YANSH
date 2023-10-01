@@ -3,7 +3,9 @@ definitions = P -- package name
 
 -- P.VERSION = "2.2" -- initial version
 -- P.VERSION = "3.0" -- fix setup file issue
-P.VERSION = "3.1"
+-- P.VERSION = "3.1" -- fix setup file issue
+-- P.VERSION = "3.2" -- add datarefs, TO weight, weather TAF and remove rounding the weights
+P.VERSION = "3.2"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
@@ -20,6 +22,7 @@ P.GITHUBURL = "https://raw.githubusercontent.com/olivierbutler/YANSH/main/data/m
 P.SIMBRIEFURL = "https://www.simbrief.com/api/xml.fetcher.php?username=%s"
 P.SIMBRIEFOFPURL = "https://www.simbrief.com/system/briefing.fmsdl.php?formatget=flightplans/"
 P.AWVXURL = "https://avwx.rest/api/metar/%s?token=%s&reporting=false&format=xml&filter=raw"
+P.AWVXTAFURL = "https://avwx.rest/api/taf/%s?token=%s&reporting=false&format=xml&filter=raw"
 P.APPNAMEPREFIX = sasl.getProjectName()
 P.APPNAMEPREFIXLONG = "Yet ANother Simbrief Helper"
 P.OFPSUFFIX = "01"
