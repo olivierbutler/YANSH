@@ -90,4 +90,81 @@ function P.splitText(text, tabSize, maxColumn)
     return split
 end
 
+local function os_is_unix()
+    return sasl.getOS() ~= 'Windows'
+end
+
+function P.create_directories(dirnames)
+    local cmd, args = nil, ""
+
+    for i, dirname in pairs(dirnames) do
+        assert(dirname:find("\"", 1, true) == nil)
+    end
+    if os_is_unix() then
+        for i, dirname in pairs(dirnames) do
+            args = args .. " \"" .. dirname .. "\""
+        end
+        cmd = "mkdir -p -- " .. args
+        sasl.logDebug("file", 1, "executing: " .. cmd)
+        os.execute(cmd)
+    else
+        -- Because CMD.EXE on Windows is dumb as a sack of hammers,
+        -- we need to feed it commands in 8191-character increments,
+        -- because NOBODY would ever need more than 8191 characters
+        -- on a line, right?
+        for i, dirname in pairs(dirnames) do
+            -- the 290 character reserve here is because CMD.EXE
+            -- counts the hostname and current directory into
+            -- its line length (?!)
+            if #args + #dirname + 3 > 7900 then
+                -- Unfuck any slashes into backslashes to deal
+                -- with FlyWithLua's broken SCRIPT_DIRECTORY
+                args = args:gsub("/", "\\")
+                cmd = "mkdir " .. args
+                sasl.logDebug("file", 1, "executing: " .. cmd)
+                os.execute(cmd)
+                args = ""
+            end
+            args = args .. " \"" .. dirname .. "\""
+        end
+        if args ~= "" then
+            args = args:gsub("/", "\\")
+            cmd = "mkdir " .. args
+            sasl.logDebug("file", 1, "executing: " .. cmd)
+            os.execute(cmd)
+        end
+    end
+end
+
+function P.check_create_path(path)
+    if not isFileExists(path) then
+        sasl.logInfo("Folder " .. path .. " does not exist... creating it")
+        helpers.create_directories({path})
+        if not isFileExists(path) then 
+            sasl.logWarning("Failure to create folder " .. path  )
+            return false
+        end
+    end
+
+    return true
+end
+
+function P.remove_directory(dirname)
+    local cmd
+
+    assert(dirname:find("..", 1, true) == nil)
+    if os_is_unix() then
+        assert(dirname:find("/", 1, true) ~= 1 or #dirname > 1)
+        cmd = "rm -rf -- \"" .. dirname .. "\""
+    else
+        dirname = dirname:gsub("/", "\\")
+        assert(dirname:find("[a-zA-Z]:\\") ~= 1 or #dirname > 3)
+        assert(dirname:find("[a-zA-Z]:\\[Ww][Ii][Nn][Dd][Oo][Ww][Ss]") == nil)
+        cmd = "rd /s /q \"" .. dirname .. "\""
+    end
+
+    sasl.logDebug("file", 1, "executing: " .. cmd)
+    local res = os.execute(cmd)
+end
+
 return helpers

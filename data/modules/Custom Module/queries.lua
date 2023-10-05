@@ -246,7 +246,7 @@ function P.fechOFP()
         P.OFP.status = 1
         P.OFP.values = {}
         P.OFP.output = {string.format("Fetching %s's OFP...", userid)}
-        sasl.net.downloadFileAsync(url, definitions.XPOUTPUTPATH .. definitions.APPNAMEPREFIX .. "_ofp.tmp", fetchOFP)
+        sasl.net.downloadFileAsync(url, definitions.YANSHCACHESPATH .. definitions.APPNAMEPREFIX .. "_ofp.tmp", fetchOFP)
     end
 end
 
@@ -254,8 +254,8 @@ local function fetchMetar(inUrl, inFilePath, inIsOk, inError)
     if onContentsDownloaded(inUrl, inFilePath, inIsOk, inError) then
         local values = sasl.readConfig(inFilePath, "xml")
         if values ~= nil then
-            local icao_code = string.sub(values.AVWX.raw, 1, 4)
-            P.METAR.values[icao_code] = values.AVWX.raw
+            local icao_code = string.sub(values.AVWX.sanitized, 1, 4)
+            P.METAR.values[icao_code] = values.AVWX.sanitized
             P.METAR.values['isError'] = false
             formatOFPDisplay(P.OFP.values.OFP)
         end
@@ -274,7 +274,7 @@ function P.fetchMetar(airport)
         P.METAR.values[airport] = nil
         P.METAR.values['isError'] = false
         formatOFPDisplay(P.OFP.values.OFP)
-        sasl.net.downloadFileAsync(url, definitions.XPOUTPUTPATH .. definitions.APPNAMEPREFIX .. "_" .. airport .. "_metar.tmp", fetchMetar)
+        sasl.net.downloadFileAsync(url, definitions.YANSHCACHESPATH .. definitions.APPNAMEPREFIX .. "_" .. airport .. "_metar.tmp", fetchMetar)
     end
 end
 
@@ -282,8 +282,8 @@ local function fetchTaf(inUrl, inFilePath, inIsOk, inError)
     if onContentsDownloaded(inUrl, inFilePath, inIsOk, inError) then
         local values = sasl.readConfig(inFilePath, "xml")
         if values ~= nil then
-            local icao_code = string.sub(values.AVWX.raw, 1, 4)
-            P.METAR.values["taf_" .. icao_code] = string.gsub(values.AVWX.raw, "<br>","") -- some html tags may be here ????
+            local icao_code = string.sub(values.AVWX.sanitized, 1, 4)
+            P.METAR.values["taf_" .. icao_code] = string.gsub(values.AVWX.sanitized, "<br>","") -- some html tags may be here ????
             P.METAR.values['taf_isError'] = false
             formatOFPDisplay(P.OFP.values.OFP)
         end
@@ -302,7 +302,7 @@ function P.fetchTaf(airport)
         P.METAR.values["taf_" .. airport] = nil
         P.METAR.values['taf_isError'] = false
         formatOFPDisplay(P.OFP.values.OFP)
-        sasl.net.downloadFileAsync(url, definitions.XPOUTPUTPATH .. definitions.APPNAMEPREFIX .. "_" .. airport .. "_taf.tmp", fetchTaf)
+        sasl.net.downloadFileAsync(url, definitions.YANSHCACHESPATH .. definitions.APPNAMEPREFIX .. "_" .. airport .. "_taf.tmp", fetchTaf)
     end
 end
 

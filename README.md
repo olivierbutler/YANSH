@@ -69,6 +69,9 @@ https://forums.x-plane.org/index.php?/files/file/86783-yansh-yet-another-simbrie
 2. xml2lua module by Manoel Campos (https://github.com/manoelcampos/xml2lua)
 
 #### History
+- 3.3 Fix taf,metar format issue, create missing folders at start ( YANSH cache, FMS folder)
+- 3.2 Add datarefs, TO weight, weather TAF and remove rounding the weights
+- 3.1 Fix setup file issue
 - 3.0 Change name to YANSH from Simbrief Helper Enh, change from lua script to SASL plugin
 - 2.2 Update modules to latest version of xml2Lua and improve logging
 - 2.1 Add automatic FMC programing

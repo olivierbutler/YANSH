@@ -15,7 +15,7 @@ hSize = size[2]
 
 local TTimer = sasl.createTimer()
 local T200msTimer = 50 * 1000 -- 200 ms
-sasl.startTimer(TTimer) 
+sasl.startTimer(TTimer)
 local wTitle = string.format("%s (%s)", definitions.APPNAMEPREFIXLONG, definitions.VERSION)
 if updateAvailable then
     wTitle = wTitle .. " " .. messages.translation['UPDATEAVAILABLE'] .. " v" .. newVersion
@@ -102,18 +102,16 @@ components = {interactive {
             qDatas.fechOFP()
         end
     end
-},
-interactive {
+}, interactive {
     position = {wdef.uplinkFMC.x, wdef.uplinkFMC.y, wdef.uplinkFMC.w, wdef.uplinkFMC.h}, -- uplinkFMC
     cursor = definitions.cursor,
     onMouseDown = function()
         if fmc.isOnGround() and fmc.isFMConPower() and (#fmc.fmcKeyQueue == 0) then
             fmc.uploadToZiboFMC(qDatas.OFP.values.OFP)
         end
-    end,
+    end
 
-},
- interactive {
+}, interactive {
     position = {wdef.metarButton.x, wdef.metarButton.y, wdef.metarButton.w, wdef.metarButton.h}, -- MetarOFP
     cursor = definitions.cursor,
     onMouseDown = function()
@@ -156,7 +154,7 @@ function update()
     -- There are lots of ways to write this sort of thing.  The important thing is to write it in a way that
     -- you can easily understand later.  (Don't forget comments)
 
- --   fmc.initTailNum()
+    --   fmc.initTailNum()
     if fmc.isZibo then
         if sasl.getElapsedMicroseconds(TTimer) > T200msTimer then
             sasl.resetTimer(TTimer)
@@ -177,12 +175,19 @@ function draw()
     windows.drawBlockTexts(wdef.fovText, {settings.getFov()})
     windows.drawButton(wdef.setupButton, true)
 
-    windows.drawButton(wdef.fetchButton, qDatas.OFP.status ~= 1 and #settings.appSettings.sbuser)
-    if #settings.appSettings.sbuser == 0 then 
-        windows.drawBlockTexts(wdef.ofpText, {messages.translation['NOUSERNAME']})
-    else 
-        windows.drawBlockTexts(wdef.ofpText, qDatas.OFP.output) 
-    end        
+    windows.drawButton(wdef.fetchButton, qDatas.OFP.status ~= 1 and #settings.appSettings.sbuser and definitions.XPFMSPATHEXIST)
+    if #settings.appSettings.sbuser == 0 or definitions.XPFMSPATHEXIST == false then
+        local error_message = {}
+        if #settings.appSettings.sbuser == 0 then
+            table.insert(error_message, messages.translation['NOUSERNAME'])
+        end
+        if definitions.XPFMSPATHEXIST == false then
+            table.insert(error_message, messages.translation['NOFMSFOLDER'])
+        end
+        windows.drawBlockTexts(wdef.ofpText, error_message)
+    else
+        windows.drawBlockTexts(wdef.ofpText, qDatas.OFP.output)
+    end
     if #qDatas.OFP.output > 1 and #settings.appSettings.avwxtoken then -- display Metar button only if OFP is displayed and avwxtoken defined
         windows.drawButton(wdef.metarButton, qDatas.METAR.status ~= 1)
 

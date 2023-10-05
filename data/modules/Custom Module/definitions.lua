@@ -5,7 +5,8 @@ definitions = P -- package name
 -- P.VERSION = "3.0" -- fix setup file issue
 -- P.VERSION = "3.1" -- fix setup file issue
 -- P.VERSION = "3.2" -- add datarefs, TO weight, weather TAF and remove rounding the weights
-P.VERSION = "3.2"
+-- P.VERSION = "3.3" -- fix taf,metart format issue, create missing folder at start ( YANSH cache, FMS folder) 
+P.VERSION = "3.3"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
@@ -15,15 +16,19 @@ if sasl.getOS() == 'Windows' then
     P.OSSEPARATOR = '\\'
 end
 
+P.APPNAMEPREFIX = sasl.getProjectName()
+
 P.XPOUTPUTPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Output" .. P.OSSEPARATOR
+P.XPCACHESPATH = P.XPOUTPUTPATH .. "caches" .. P.OSSEPARATOR
+P.YANSHCACHESPATH = P.XPOUTPUTPATH .. "caches" .. P.OSSEPARATOR .. P.APPNAMEPREFIX .. ".cache".. P.OSSEPARATOR 
 P.XPFMSPATH = P.XPOUTPUTPATH .. "FMS plans" .. P.OSSEPARATOR
+P.XPFMSPATHEXIST = false
 P.XPRESSOURCESPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Resources" .. P.OSSEPARATOR
 P.GITHUBURL = "https://raw.githubusercontent.com/olivierbutler/YANSH/main/data/modules/configuration/version.ini" 
 P.SIMBRIEFURL = "https://www.simbrief.com/api/xml.fetcher.php?username=%s"
 P.SIMBRIEFOFPURL = "https://www.simbrief.com/system/briefing.fmsdl.php?formatget=flightplans/"
-P.AWVXURL = "https://avwx.rest/api/metar/%s?token=%s&reporting=false&format=xml&filter=raw"
-P.AWVXTAFURL = "https://avwx.rest/api/taf/%s?token=%s&reporting=false&format=xml&filter=raw"
-P.APPNAMEPREFIX = sasl.getProjectName()
+P.AWVXURL = "https://avwx.rest/api/metar/%s?token=%s&reporting=false&format=xml&filter=sanitized"
+P.AWVXTAFURL = "https://avwx.rest/api/taf/%s?token=%s&reporting=false&format=xml&filter=sanitized"
 P.APPNAMEPREFIXLONG = "Yet ANother Simbrief Helper"
 P.OFPSUFFIX = "01"
 

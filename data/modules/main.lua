@@ -6,12 +6,31 @@ sasl.setLogLevel(LOG_INFO)
 require("settings")
 qDatas = require("queries")
 require("fmc")
+require("helpers")
 
 sasl.options.setAircraftPanelRendering(false)
 sasl.options.set3DRendering(false)
 sasl.options.setInteractivity(true)
 
 updateAvailable, newVersion = qDatas.checkForUpdate()
+
+-- create cache and FMS folder if not exist
+if helpers.check_create_path(definitions.XPCACHESPATH) then
+    if not helpers.check_create_path(definitions.YANSHCACHESPATH) then 
+        sasl.logWarning("Fail to create cache folder, reverting to legacy folder")
+        definitions.YANSHCACHESPATH = definitions.XPOUTPUTPATH    
+    end
+else 
+    sasl.logWarning("Fail to create cache folder, reverting to legacy folder")
+    definitions.YANSHCACHESPATH = definitions.XPOUTPUTPATH    
+end
+
+definitions.XPFMSPATHEXIST = helpers.check_create_path(definitions.XPFMSPATH) 
+if not definitions.XPFMSPATHEXIST then
+    sasl.logWarning("Fail to create fms folder, Fetch button disabled")
+end
+
+
 
 local xRoot, yRoot, wRoot, hRoot = sasl.windows.getMonitorBoundsOS(0)
 

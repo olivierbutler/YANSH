@@ -58,7 +58,7 @@ end
 
 function P.writeSettings(currentSetting)
     if sasl.writeConfig(settingPath, settingFormat, currentSetting) == false then
-        sasl.logError("Unable to write settings to disk")
+        sasl.logWarning("Unable to write settings to disk")
     end
 end
 
