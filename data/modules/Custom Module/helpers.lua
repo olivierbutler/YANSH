@@ -136,11 +136,34 @@ function P.create_directories(dirnames)
     end
 end
 
+
+function file_exists_v2(file)
+    -- some error codes:
+    -- 13 : EACCES - Permission denied
+    -- 17 : EEXIST - File exists
+    -- 20	: ENOTDIR - Not a directory
+    -- 21	: EISDIR - Is a directory
+    --
+    local isok, errstr, errcode = os.rename(file, file)
+    if isok == nil then
+       if errcode == 13 then 
+          -- Permission denied, but it exists
+          return true
+       end
+       return false
+    end
+    return true
+  end
+  
+  function dir_exists_v2(path)
+    return file_exists_v2(path .. "/")
+  end
+
 function P.check_create_path(path)
-    if not isFileExists(path) then
+    if not dir_exists_v2(path) then
         sasl.logInfo("Folder " .. path .. " does not exist... creating it")
         helpers.create_directories({path})
-        if not isFileExists(path) then 
+        if not dir_exists_v2(path) then 
             sasl.logWarning("Failure to create folder " .. path  )
             return false
         end
