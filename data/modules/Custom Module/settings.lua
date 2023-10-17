@@ -91,8 +91,14 @@ function P.getSettings()
     end
 
     -- some init are not done well
+    if type(currentSetting.sbuser) ~= 'string'  then 
+        currentSetting.sbuser = ""
+    end    
     if #currentSetting.sbuser == 0 then 
         currentSetting.sbuser = ""
+    end    
+    if type(currentSetting.avwxtoken) ~= 'string'then 
+        currentSetting.avwxtoken = ""
     end    
     if #currentSetting.avwxtoken == 0 then 
         currentSetting.avwxtoken = ""

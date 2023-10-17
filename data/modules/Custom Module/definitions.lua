@@ -7,7 +7,8 @@ definitions = P -- package name
 -- P.VERSION = "3.2" -- add datarefs, TO weight, weather TAF and remove rounding the weights
 -- P.VERSION = "3.3" -- fix taf,metart format issue, create missing folder at start ( YANSH cache, FMS folder) 
 -- P.VERSION = "3.4" -- fix issue on folder checking on windows
-P.VERSION = "3.4"
+-- P.VERSION = "3.5" -- fix issue on prf file with wrong variable type
+P.VERSION = "3.5"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
