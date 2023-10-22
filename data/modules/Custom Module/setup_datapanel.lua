@@ -45,6 +45,14 @@ wdef = {
         w = definitions.checkBoxWidth,
         h = definitions.checkBoxHeight
     },
+    hideMagicSquare = {
+        t = messages.translation['HIDEMSQUARE'],
+        value = settings.appSettings.hideMagicSquare,
+        x = 10,
+        y = hSize - 180,
+        w = definitions.checkBoxWidth,
+        h = definitions.checkBoxHeight
+    },
     sbUser = {
         t = messages.translation['SBUSERNAME'],
         value = settings.appSettings.sbuser,
@@ -86,6 +94,15 @@ components = {interactive {
         settings.appSettings.upload2FMC = not settings.appSettings.upload2FMC
         settings.writeSettings(settings.appSettings)
         wdef.ziboFmc.value = settings.appSettings.upload2FMC
+    end
+},interactive {
+    position = {wdef.hideMagicSquare.x, wdef.hideMagicSquare.y, wdef.hideMagicSquare.w, wdef.hideMagicSquare.h}, -- Hide Magic square
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        settings.appSettings.hideMagicSquare = not settings.appSettings.hideMagicSquare
+        settings.writeSettings(settings.appSettings)
+        show_hide_magic_square(not settings.appSettings.hideMagicSquare)
+        wdef.hideMagicSquare.value = settings.appSettings.hideMagicSquare
     end
 },interactive {
     position = {wdef.debugMode.x, wdef.debugMode.y, wdef.debugMode.w, wdef.debugMode.h}, -- Debug Mode
@@ -156,6 +173,7 @@ function draw()
 
     windows.drawCheckBox(wdef.ziboFmc)
     windows.drawCheckBox(wdef.debugMode)
+    windows.drawCheckBox(wdef.hideMagicSquare)
 
     drawAll(components) -- This line is not always necessary for drawing, but if you want to see your click zones, in X-Plane 
     -- include it at the end of your draw function	

@@ -97,11 +97,20 @@ function P.getSettings()
     if #currentSetting.sbuser == 0 then 
         currentSetting.sbuser = ""
     end    
-    if type(currentSetting.avwxtoken) ~= 'string'then 
+    if type(currentSetting.avwxtoken) ~= 'string' then 
         currentSetting.avwxtoken = ""
     end    
     if #currentSetting.avwxtoken == 0 then 
         currentSetting.avwxtoken = ""
+    end
+
+    -- extra optional setting
+    if currentSetting.hideMagicSquare == nil then
+        currentSetting.hideMagicSquare = false
+    else 
+        if type(currentSetting.avwxtoken) ~= 'boolean' then
+            currentSetting.hideMagicSquare = false
+        end    
     end    
     return currentSetting
 end

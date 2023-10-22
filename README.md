@@ -69,7 +69,8 @@ https://forums.x-plane.org/index.php?/files/file/86783-yansh-yet-another-simbrie
 2. xml2lua module by Manoel Campos (https://github.com/manoelcampos/xml2lua)
 
 #### History
-- #.5 Fix issue on prf file with wrong variable type
+- 3.6 add setting to have the 'magic square' visible or not
+- 3.5 Fix issue on prf file with wrong variable type
 - 3.4 Fix issue on folder checking on windows
 - 3.3 Fix taf,metar format issue, create missing folders at start ( YANSH cache, FMS folder)
 - 3.2 Add datarefs, TO weight, weather TAF and remove rounding the weights

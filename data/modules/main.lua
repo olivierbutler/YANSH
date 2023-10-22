@@ -37,7 +37,7 @@ local xRoot, yRoot, wRoot, hRoot = sasl.windows.getMonitorBoundsOS(0)
 local winRoot = contextWindow {
     noDecore = true,
     position = {xRoot + 10, yRoot + 10, 20, 20},
-    visible = true,
+    visible = not settings.appSettings.hideMagicSquare,
     noResize = true,
     vrAuto = true,
     noBackground = true,
@@ -89,6 +89,10 @@ setup_datapanel = contextWindow {
 }
 
 interactive_datapanel:setMovable(true)
+
+function show_hide_magic_square(value)
+    winRoot:setIsVisible(value)
+end
 
 function show_hide()
     interactive_datapanel:setIsVisible(not interactive_datapanel:isVisible())

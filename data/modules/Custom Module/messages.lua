@@ -19,7 +19,8 @@ local english = {
     PASTE = "Paste",
     AVWXTOKEN = "Avwx token",
     DEBUGMODE = "Enable Debug Logging mode",
-    NOFMSFOLDER = "'FMS plans' folder is missing, please create it in 'XP folder'/Output"
+    NOFMSFOLDER = "'FMS plans' folder is missing, please create it in 'XP folder'/Output",
+    HIDEMSQUARE = "Hide the 'Magic square'"
 }
 
 local french = {
@@ -37,7 +38,8 @@ local french = {
     PASTE = "Coller",
     AVWXTOKEN = "Avwx token",
     DEBUGMODE = "Activer le log en mode Debug",
-    NOFMSFOLDER = "Le dossier 'FMS plans' est manquant, svp creer le dans 'XP folder'/Output"
+    NOFMSFOLDER = "Le dossier 'FMS plans' est manquant, svp creer le dans 'XP folder'/Output",
+    HIDEMSQUARE = "Cacher le 'carré magique'"
 }
 
 
