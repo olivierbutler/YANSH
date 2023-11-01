@@ -69,7 +69,7 @@ interactive_datapanel = contextWindow {
     }}
 }
 
-local st_height = 200
+local st_height = 300
 local st_width = 700
 local st_x_org = xRoot + (wRoot - st_width) / 2
 local st_y_org = yRoot + (hRoot - st_height) / 2

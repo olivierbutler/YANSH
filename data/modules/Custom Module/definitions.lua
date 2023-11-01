@@ -9,7 +9,8 @@ definitions = P -- package name
 -- P.VERSION = "3.4" -- fix issue on folder checking on windows
 -- P.VERSION = "3.5" -- fix issue on prf file with wrong variable type
 -- P.VERSION = "3.6" -- add setting to have the 'magic square' visible or not
-P.VERSION = "3.6"
+-- P.VERSION = "3.7" -- do not populate the plan fuel if option is disable or engine running add setting to disable populating the RESERVE item in the FMC
+P.VERSION = "3.7"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
@@ -34,6 +35,7 @@ P.AWVXURL = "https://avwx.rest/api/metar/%s?token=%s&reporting=false&format=xml&
 P.AWVXTAFURL = "https://avwx.rest/api/taf/%s?token=%s&reporting=false&format=xml&filter=sanitized"
 P.APPNAMEPREFIXLONG = "Yet ANother Simbrief Helper"
 P.OFPSUFFIX = "01"
+P.ZIBOFILE = "b738x"
 
 P.closeXHeight = 25
 P.closeXWidth = P.closeXHeight

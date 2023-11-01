@@ -20,7 +20,8 @@ local english = {
     AVWXTOKEN = "Avwx token",
     DEBUGMODE = "Enable Debug Logging mode",
     NOFMSFOLDER = "'FMS plans' folder is missing, please create it in 'XP folder'/Output",
-    HIDEMSQUARE = "Hide the 'Magic square'"
+    HIDEMSQUARE = "Hide the 'Magic square'",
+    DISABLERESERVEFUEL = "Do not populate FMC's 'RESERVES' (Zibo B737 only)"
 }
 
 local french = {
@@ -39,7 +40,8 @@ local french = {
     AVWXTOKEN = "Avwx token",
     DEBUGMODE = "Activer le log en mode Debug",
     NOFMSFOLDER = "Le dossier 'FMS plans' est manquant, svp creer le dans 'XP folder'/Output",
-    HIDEMSQUARE = "Cacher le 'carré magique'"
+    HIDEMSQUARE = "Cacher le 'carré magique'",
+    DISABLERESERVEFUEL = "Ne pas remplir 'RESERVES' du FMC (Zibo B737 uniquement)"
 }
 
 

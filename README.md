@@ -69,6 +69,7 @@ https://forums.x-plane.org/index.php?/files/file/86783-yansh-yet-another-simbrie
 2. xml2lua module by Manoel Campos (https://github.com/manoelcampos/xml2lua)
 
 #### History
+- 3.7 fix issue with uplink FMC while engines are running, add setting to populate or not the RESERVES value,  and add support for new uplink features on Zibo Xp12 RC5.2+ (b738x.fms and b738x.xml automatically downloaded) All features of YANSH are still compatible with Zibo Xp12 RC5.2+
 - 3.6 add setting to have the 'magic square' visible or not
 - 3.5 Fix issue on prf file with wrong variable type
 - 3.4 Fix issue on folder checking on windows

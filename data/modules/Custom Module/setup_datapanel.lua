@@ -41,7 +41,7 @@ wdef = {
         t = messages.translation['DEBUGMODE'],
         value = false,
         x = 10,
-        y = hSize - 150,
+        y = hSize - 210,
         w = definitions.checkBoxWidth,
         h = definitions.checkBoxHeight
     },
@@ -50,6 +50,14 @@ wdef = {
         value = settings.appSettings.hideMagicSquare,
         x = 10,
         y = hSize - 180,
+        w = definitions.checkBoxWidth,
+        h = definitions.checkBoxHeight
+    },
+    ziboReserveFuelDisable = {
+        t = messages.translation['DISABLERESERVEFUEL'],
+        value = settings.appSettings.ziboReserveFuelDisable,
+        x = 10,
+        y = hSize - 150,
         w = definitions.checkBoxWidth,
         h = definitions.checkBoxHeight
     },
@@ -103,6 +111,14 @@ components = {interactive {
         settings.writeSettings(settings.appSettings)
         show_hide_magic_square(not settings.appSettings.hideMagicSquare)
         wdef.hideMagicSquare.value = settings.appSettings.hideMagicSquare
+    end
+},interactive {
+    position = {wdef.ziboReserveFuelDisable.x, wdef.ziboReserveFuelDisable.y, wdef.ziboReserveFuelDisable.w, wdef.ziboReserveFuelDisable.h}, -- Disable FMC Reserve
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        settings.appSettings.ziboReserveFuelDisable = not settings.appSettings.ziboReserveFuelDisable
+        settings.writeSettings(settings.appSettings)
+        wdef.ziboReserveFuelDisable.value = settings.appSettings.ziboReserveFuelDisable
     end
 },interactive {
     position = {wdef.debugMode.x, wdef.debugMode.y, wdef.debugMode.w, wdef.debugMode.h}, -- Debug Mode
@@ -174,6 +190,7 @@ function draw()
     windows.drawCheckBox(wdef.ziboFmc)
     windows.drawCheckBox(wdef.debugMode)
     windows.drawCheckBox(wdef.hideMagicSquare)
+    windows.drawCheckBox(wdef.ziboReserveFuelDisable)
 
     drawAll(components) -- This line is not always necessary for drawing, but if you want to see your click zones, in X-Plane 
     -- include it at the end of your draw function	

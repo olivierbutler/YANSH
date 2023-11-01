@@ -159,7 +159,7 @@ function update()
         if sasl.getElapsedMicroseconds(TTimer) > T200msTimer then
             sasl.resetTimer(TTimer)
             sasl.startTimer(TTimer)
-            sasl.logDebug("Timer reach " .. T200msTimer .. " uS")
+            -- sasl.logDebug("Timer reach " .. T200msTimer .. " uS")
             fmc.pushKeyToFMC()
         end
     end

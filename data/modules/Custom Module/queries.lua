@@ -44,7 +44,10 @@ local function onContentsDownloaded(inUrl, inFilePath, inIsOk, inError)
 end
 
 local function fetchfmsFile(inUrl, inFilePath, inIsOk, inError)
-    onContentsDownloaded(inUrl, inFilePath, inIsOk, inError)
+    if onContentsDownloaded(inUrl, inFilePath, inIsOk, inError) then 
+        local fmsZiboFilePath = definitions.XPFMSPATH .. definitions.ZIBOFILE .. ".fms"
+        helpers.cp_file(inFilePath, fmsZiboFilePath) -- fms file for Zibo RC5.2+ datalink
+    end    
 end
 
 local function formatOFPDisplay(ofpData)
@@ -213,7 +216,9 @@ local function fetchOFP(inUrl, inFilePath, inIsOk, inError)
 
         local xmlFile = string.format("%s%s%s", P.OFP.values.OFP.origin.icao_code, P.OFP.values.OFP.destination.icao_code, definitions.OFPSUFFIX)
         local xmlFilePath = definitions.XPFMSPATH .. xmlFile .. ".xml"
+        local xmlZiboFilePath = definitions.XPFMSPATH .. definitions.ZIBOFILE .. ".xml"
         helpers.cp_file(inFilePath, xmlFilePath)
+        helpers.cp_file(inFilePath, xmlZiboFilePath) -- xml file for Zibo RC5.2+ datalink
 
         local downloadfmsFileUrl = definitions.SIMBRIEFOFPURL -- should use this, but is not working -- P.OFP.values.OFP.fms_downloads.directory 
         local fmsFileUrl = downloadfmsFileUrl .. P.OFP.values.OFP.fms_downloads.xpe.link

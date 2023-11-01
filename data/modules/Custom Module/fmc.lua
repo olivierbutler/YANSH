@@ -2,7 +2,7 @@ local P = {}
 fmc = P -- package name
 
 require("definitions")
-
+require("settings")
 P.fmcKeyQueue = {}
 P.fmcQueueLocked = false
 local fmcKeyWait = 0
@@ -12,6 +12,9 @@ local acf_tailnum = globalProperty("sim/aircraft/view/acf_tailnum")
 local ground_speed = globalProperty("sim/flightmodel/position/groundspeed")
 local main_bus = nil
 local main_battery = nil
+
+local engine_N2_1 = globalPropertyfae("sim/flightmodel2/engines/N2_percent",1)
+local engine_N2_2 = globalPropertyfae("sim/flightmodel2/engines/N2_percent",2)
 
 function P.isOnGround()
     return (get(ground_speed) < 5)
@@ -90,6 +93,22 @@ local function pushKeyToBuffer(startKey, inputString, endKey)
 
 end
 
+local function is_plan_fuel_enable()
+    local fuel_plan_option = globalProperty("laminar/B738/plan_fuel")
+    local option_enable = get(fuel_plan_option)
+    sasl.logDebug("Plan fuel option is " .. option_enable)
+    local engine_N2_1_ = get(engine_N2_1)
+    local engine_N2_2_ = get(engine_N2_2)
+    sasl.logDebug("Engines N2 " .. engine_N2_1_ .. " / " .. engine_N2_2_)
+    local result = option_enable >0 and engine_N2_1_ < 50 and engine_N2_2_ < 50
+    if result then 
+        sasl.logDebug("Fuel plan option enabled AND engines not running" )
+    else 
+        sasl.logDebug("Fuel plan option disable OR engines running" )
+    end        
+    return result
+end
+
 function P.uploadToZiboFMC(ofpData)
 
     if P.isZibo then
@@ -112,9 +131,13 @@ function P.uploadToZiboFMC(ofpData)
         pushKeyToBuffer("", ofpData.general.flight_number, "2R")
         pushKeyToBuffer("init_ref", "", "6L")
         pushKeyToBuffer("3L", "", "")
-        pushKeyToBuffer("", string.format("%1.1f", (math.ceil(ofpData.fuel.plan_ramp / 100) * 100 + 100) / 1000), "2L")
+        if is_plan_fuel_enable() then 
+            pushKeyToBuffer("", string.format("%1.1f", (math.ceil(ofpData.fuel.plan_ramp / 100) * 100 + 100) / 1000), "2L")
+        end
         pushKeyToBuffer("", string.format("%1.1f", ofpData.weights.est_zfw / 1000), "3L")
-        pushKeyToBuffer("", string.format("%1.1f", (ofpData.fuel.reserve + ofpData.fuel.alternate_burn) / 1000), "4L")
+        if not settings.appSettings.ziboReserveFuelDisable then 
+            pushKeyToBuffer("", string.format("%1.1f", (ofpData.fuel.reserve + ofpData.fuel.alternate_burn) / 1000), "4L")
+        end 
         pushKeyToBuffer("", string.format("%1d", ofpData.general.costindex), "5L")
         pushKeyToBuffer("", string.format("%1.0f", ofpData.general.initial_altitude / 100), "1R")
         pushKeyToBuffer("", string.format("%03d/%03d", ofpData.navlog.fix[iTOC].wind_dir, ofpData.navlog.fix[iTOC].wind_spd), "2R")

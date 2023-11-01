@@ -108,10 +108,20 @@ function P.getSettings()
     if currentSetting.hideMagicSquare == nil then
         currentSetting.hideMagicSquare = false
     else 
-        if type(currentSetting.avwxtoken) ~= 'boolean' then
+        if type(currentSetting.hideMagicSquare) ~= 'boolean' then
             currentSetting.hideMagicSquare = false
         end    
     end    
+
+    -- extra optional setting
+    if currentSetting.ziboReserveFuelDisable == nil then
+        currentSetting.ziboReserveFuelDisable = false
+    else 
+        if type(currentSetting.ziboReserveFuelDisable) ~= 'boolean' then
+            currentSetting.ziboReserveFuelDisable = false
+        end    
+    end    
+    
     return currentSetting
 end
 
