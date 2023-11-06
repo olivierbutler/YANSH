@@ -126,6 +126,12 @@ function P.uploadToZiboFMC(ofpData)
 
         sasl.logInfo("Zibo B737 status ok : computing the FMC")
         P.fmcQueueLocked = true
+        -- clear the scratchpad
+        pushKeyToBuffer("del", "", "")
+        pushKeyToBuffer("del", "", "")
+        pushKeyToBuffer("clr", "", "")
+        pushKeyToBuffer("clr", "", "")
+
         pushKeyToBuffer("rte", ofpData.origin.icao_code .. ofpData.destination.icao_code .. definitions.OFPSUFFIX, "2L")
         pushKeyToBuffer("", ofpData.origin.plan_rwy, "3L")
         pushKeyToBuffer("", ofpData.general.flight_number, "2R")
@@ -139,7 +145,8 @@ function P.uploadToZiboFMC(ofpData)
             pushKeyToBuffer("", string.format("%1.1f", (ofpData.fuel.reserve + ofpData.fuel.alternate_burn) / 1000), "4L")
         end 
         pushKeyToBuffer("", string.format("%1d", ofpData.general.costindex), "5L")
-        pushKeyToBuffer("", string.format("%1.0f", ofpData.general.initial_altitude / 100), "1R")
+--        pushKeyToBuffer("", string.format("%1.0f", ofpData.general.initial_altitude / 100), "1R")
+        pushKeyToBuffer("", string.format("%1.0f", ofpData.maxStepClimb / 100), "1R")
         pushKeyToBuffer("", string.format("%03d/%03d", ofpData.navlog.fix[iTOC].wind_dir, ofpData.navlog.fix[iTOC].wind_spd), "2R")
         pushKeyToBuffer("", string.format("%dC", ofpData.navlog.fix[iTOC].oat_isa_dev), "3R")
         P.fmcQueueLocked = false
