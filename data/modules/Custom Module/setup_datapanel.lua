@@ -29,17 +29,25 @@ wdef = {
         h = definitions.closeXHeight,
         withBorder = false
     },
-    ziboFmc = {
-        t = messages.translation['UPLINKZIBO'],
-        value = settings.appSettings.upload2FMC,
-        x = 10,
-        y = hSize - 120,
-        w = definitions.checkBoxWidth,
-        h = definitions.checkBoxHeight
-    },
     debugMode = {
         t = messages.translation['DEBUGMODE'],
         value = false,
+        x = 10,
+        y = hSize - 270,
+        w = definitions.checkBoxWidth,
+        h = definitions.checkBoxHeight
+    },
+    displayBorder = {
+        t = messages.translation['DISPLAYBORDER'],
+        value = settings.appSettings.displayBorder,
+        x = 10,
+        y = hSize - 240,
+        w = definitions.checkBoxWidth,
+        h = definitions.checkBoxHeight
+    },
+    magicLeftClick = {
+        t = messages.translation['MAGICLEFTCLICK'],
+        value = settings.appSettings.magicLeftClick,
         x = 10,
         y = hSize - 210,
         w = definitions.checkBoxWidth,
@@ -58,6 +66,14 @@ wdef = {
         value = settings.appSettings.ziboReserveFuelDisable,
         x = 10,
         y = hSize - 150,
+        w = definitions.checkBoxWidth,
+        h = definitions.checkBoxHeight
+    },
+    ziboFmc = {
+        t = messages.translation['UPLINKZIBO'],
+        value = settings.appSettings.upload2FMC,
+        x = 10,
+        y = hSize - 120,
         w = definitions.checkBoxWidth,
         h = definitions.checkBoxHeight
     },
@@ -133,6 +149,23 @@ components = {interactive {
             sasl.logInfo("log mode set to INFO")
         end
     end
+},interactive {
+    position = {wdef.displayBorder.x, wdef.displayBorder.y, wdef.displayBorder.w, wdef.displayBorder.h}, -- display borders
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        settings.appSettings.displayBorder = not settings.appSettings.displayBorder
+        settings.writeSettings(settings.appSettings)
+        wdef.displayBorder.value = settings.appSettings.displayBorder
+        sasl.scheduleProjectReboot()
+    end
+},interactive {
+    position = {wdef.magicLeftClick.x, wdef.magicLeftClick.y, wdef.magicLeftClick.w, wdef.magicLeftClick.h}, -- Magic left click
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        settings.appSettings.magicLeftClick = not settings.appSettings.magicLeftClick
+        settings.writeSettings(settings.appSettings)
+        wdef.magicLeftClick.value = settings.appSettings.magicLeftClick
+    end
 }, interactive {
     position = {wdef.closeButton.x, wdef.closeButton.y, wdef.closeButton.w, wdef.closeButton.h}, -- Close the window
     cursor = definitions.cursor,
@@ -191,6 +224,8 @@ function draw()
     windows.drawCheckBox(wdef.debugMode)
     windows.drawCheckBox(wdef.hideMagicSquare)
     windows.drawCheckBox(wdef.ziboReserveFuelDisable)
+    windows.drawCheckBox(wdef.displayBorder)
+    windows.drawCheckBox(wdef.magicLeftClick) 
 
     drawAll(components) -- This line is not always necessary for drawing, but if you want to see your click zones, in X-Plane 
     -- include it at the end of your draw function	

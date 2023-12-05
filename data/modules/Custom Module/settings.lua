@@ -121,6 +121,24 @@ function P.getSettings()
             currentSetting.ziboReserveFuelDisable = false
         end    
     end    
+
+    -- extra optional setting
+    if currentSetting.displayBorder == nil then
+        currentSetting.displayBorder = false
+    else 
+        if type(currentSetting.displayBorder) ~= 'boolean' then
+            currentSetting.displayBorder = false
+        end    
+    end    
+
+    -- extra optional setting
+    if currentSetting.magicLeftClick == nil then
+        currentSetting.magicLeftClick = false
+    else 
+        if type(currentSetting.magicLeftClick) ~= 'boolean' then
+            currentSetting.magicLeftClick = false
+        end    
+    end    
     
     return currentSetting
 end

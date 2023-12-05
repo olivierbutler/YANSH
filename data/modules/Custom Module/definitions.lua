@@ -11,7 +11,8 @@ definitions = P -- package name
 -- P.VERSION = "3.6" -- add setting to have the 'magic square' visible or not
 -- P.VERSION = "3.7" -- do not populate the plan fuel if option is disable or engine running add setting to disable populating the RESERVE item in the FMC
 -- P.VERSION = "3.8" -- clear the scratchpad before uploading, use the max cruise altitude instead of the initial altitude, display now also the flight number and the landing weight
-P.VERSION = "3.8"
+-- P.VERSION = "3.9" -- add VR borders display option,  fetch/uplink OFP button can be assign to as key, b737x files are not downloaded if  not B738 aircraft
+P.VERSION = "3.9"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW

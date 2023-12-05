@@ -21,7 +21,9 @@ local english = {
     DEBUGMODE = "Enable Debug Logging mode",
     NOFMSFOLDER = "'FMS plans' folder is missing, please create it in 'XP folder'/Output",
     HIDEMSQUARE = "Hide the 'Magic square'",
-    DISABLERESERVEFUEL = "Do not populate FMC's 'RESERVES' (Zibo B737 only)"
+    DISABLERESERVEFUEL = "Do not populate FMC's 'RESERVES' (Zibo B737 only)",
+    DISPLAYBORDER = "Display YANSH window with borders (useful in VR mode) (YANSH will restart)",
+    MAGICLEFTCLICK = "Click the magic square with the left button (instead of the right button)"
 }
 
 local french = {
@@ -41,7 +43,9 @@ local french = {
     DEBUGMODE = "Activer le log en mode Debug",
     NOFMSFOLDER = "Le dossier 'FMS plans' est manquant, svp creer le dans 'XP folder'/Output",
     HIDEMSQUARE = "Cacher le 'carré magique'",
-    DISABLERESERVEFUEL = "Ne pas remplir 'RESERVES' du FMC (Zibo B737 uniquement)"
+    DISABLERESERVEFUEL = "Ne pas remplir 'RESERVES' du FMC (Zibo B737 uniquement)",
+    DISPLAYBORDER = "Affiche la fenêtre YANSH avec des bordures (utile en mode VR). (YANSH va redémarrer)",
+    MAGICLEFTCLICK = "Clic le 'carré magique' avec le bouton gauche (au lieu du bouton droit)"
 }
 
 
