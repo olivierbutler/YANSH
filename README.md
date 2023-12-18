@@ -10,8 +10,9 @@ This plugins upload Simbrief OFP to Zibo's B738 FMC (formely Simbrief Helper Enh
     folder.
 
     On native XP B737 or Zibo B737, while programming the FMC , the
-    CO-ROUTE item can be populated with LFPODAAG01 thanks only to
-    Simbrief Helper Enh.
+    CO-ROUTE item can be populated with LFPODAAG01.
+
+    On Zibo B737 RC5.2+:  b738x.fms and b738x.xml files are automatically downloaded, making the 'FLT PLAN REQUEST' and other 'UPLINK' features available.
 
     On Zibo B737, on DES page / forecast : the uplink button can be used
     to get the wind datas (only if the OFP **layout is LIDO**)
@@ -23,10 +24,11 @@ This plugins upload Simbrief OFP to Zibo's B738 FMC (formely Simbrief Helper Enh
     - the Reserve + Alternate fuel quantity
     
 3. YANSH displays updated METAR along your flight.
-    - go to https://avwx.rest and register for free
-    - get you own API token at the page https://account.avwx.rest/tokens
-    - then paste in the YANSH's setup window
-    - At any time METARs can be updated by clicking on the "Refresh Metar" button
+    - No registration needed
+    ~~- go to avwx.rest and register for free~~
+    ~~- get you own API token at the page account.avwx.rest/tokens~~
+    ~~- then paste in the YANSH's setup window~~
+    ~~- At any time METARs can be updated by clicking on the "Refresh Metar" button ~~
 
 4. Field of View angle keeper
     The Field of View angle (FoV) is a global setting of X-plane. This
@@ -69,10 +71,11 @@ https://forums.x-plane.org/index.php?/files/file/86783-yansh-yet-another-simbrie
 2. xml2lua module by Manoel Campos (https://github.com/manoelcampos/xml2lua)
 
 #### History
-- 3.9 add VR borders display option,  fetch/uplink OFP button can be assign to as key, b737x files are not downloaded if  not B738 aircraft
-- 3.8 clear the scratchpad before uploading, use the max cruise altitude instead of the initial altitude, display now also the flight number and the landing weight
-- 3.7 fix issue with uplink FMC while engines are running, add setting to populate or not the RESERVES value,  and add support for new uplink features on Zibo Xp12 RC5.2+ (b738x.fms and b738x.xml automatically downloaded) All features of YANSH are still compatible with Zibo Xp12 RC5.2+
-- 3.6 add setting to have the 'magic square' visible or not
+- 3.10 Replace avwx service by aviationweather.gov (no registration needed)
+- 3.9 Add VR borders display option,  fetch/uplink OFP button can be assign to as key, b737x files are not downloaded if not B738 aircraft
+- 3.8 Clear the scratchpad before uploading, use the max cruise altitude instead of the initial altitude, display now also the flight number and the landing weight
+- 3.7 Fix issue with uplink FMC while engines are running, add setting to populate or not the RESERVES value,  and add support for new uplink features on Zibo Xp12 RC5.2+ (b738x.fms and b738x.xml automatically downloaded) All features of YANSH are still compatible with Zibo Xp12 RC5.2+
+- 3.6 Add setting to have the 'magic square' visible or not
 - 3.5 Fix issue on prf file with wrong variable type
 - 3.4 Fix issue on folder checking on windows
 - 3.3 Fix taf,metar format issue, create missing folders at start ( YANSH cache, FMS folder)

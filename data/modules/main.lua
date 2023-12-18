@@ -47,7 +47,7 @@ local winRoot = contextWindow {
     }}
 }
 
-local dp_height = 700
+local dp_height = 750
 local dp_width = 700
 local dp_x_org = xRoot + wRoot - dp_width - 50
 local dp_y_org = yRoot + 50 -- + hRoot  - dp_height

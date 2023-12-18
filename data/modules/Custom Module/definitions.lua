@@ -12,7 +12,8 @@ definitions = P -- package name
 -- P.VERSION = "3.7" -- do not populate the plan fuel if option is disable or engine running add setting to disable populating the RESERVE item in the FMC
 -- P.VERSION = "3.8" -- clear the scratchpad before uploading, use the max cruise altitude instead of the initial altitude, display now also the flight number and the landing weight
 -- P.VERSION = "3.9" -- add VR borders display option,  fetch/uplink OFP button can be assign to as key, b737x files are not downloaded if  not B738 aircraft
-P.VERSION = "3.9"
+-- P.VERSION = "3.10" -- replace avwx service by aviationweather.gov (no registration needed)
+P.VERSION = "3.10"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
@@ -35,6 +36,7 @@ P.SIMBRIEFURL = "https://www.simbrief.com/api/xml.fetcher.php?username=%s"
 P.SIMBRIEFOFPURL = "https://www.simbrief.com/system/briefing.fmsdl.php?formatget=flightplans/"
 P.AWVXURL = "https://avwx.rest/api/metar/%s?token=%s&reporting=false&format=xml&filter=sanitized"
 P.AWVXTAFURL = "https://avwx.rest/api/taf/%s?token=%s&reporting=false&format=xml&filter=sanitized"
+P.AVWEATHERFURL = "https://aviationweather.gov/api/data/metar?taf=true&format=raw&ids=%s,%s"
 P.APPNAMEPREFIXLONG = "Yet ANother Simbrief Helper"
 P.OFPSUFFIX = "01"
 P.ZIBOFILE = "b738x"

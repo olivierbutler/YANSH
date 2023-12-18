@@ -115,9 +115,8 @@ components = {interactive {
     position = {wdef.metarButton.x, wdef.metarButton.y, wdef.metarButton.w, wdef.metarButton.h}, -- MetarOFP
     cursor = definitions.cursor,
     onMouseDown = function()
-        if qDatas.METAR.status ~= 1 and qDatas.OFP.status == 2 and #settings.appSettings.avwxtoken then
-            qDatas.fetchMetar(qDatas.OFP.values.OFP.origin.icao_code)
-            qDatas.fetchMetar(qDatas.OFP.values.OFP.destination.icao_code)
+        if qDatas.METAR.status ~= 1 and qDatas.OFP.status == 2 then
+            qDatas.fetchMetars(qDatas.OFP.values.OFP.origin.icao_code, qDatas.OFP.values.OFP.destination.icao_code)
         end
     end
 }, interactive {
@@ -188,7 +187,7 @@ function draw()
     else
         windows.drawBlockTexts(wdef.ofpText, qDatas.OFP.output)
     end
-    if #qDatas.OFP.output > 1 and #settings.appSettings.avwxtoken then -- display Metar button only if OFP is displayed and avwxtoken defined
+    if #qDatas.OFP.output > 1 then -- display Metar button only if OFP is displayed and avwxtoken defined
         windows.drawButton(wdef.metarButton, qDatas.METAR.status ~= 1)
 
         if fmc.isZibo then

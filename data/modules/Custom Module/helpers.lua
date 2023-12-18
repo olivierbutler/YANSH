@@ -55,6 +55,33 @@ function P.cleanString(text, noSpace)
     return newText
 end
 
+function P.ifnull(text, sub)
+    if type(text) ~= 'string'  then
+        return sub
+    end
+    return text
+end
+
+function P.trimInnerSpace(text)
+    local newText = ""
+    local loopSkip = false
+
+    for i = 1, string.len(text), 1 do
+        -- ugly filtering
+        if string.byte(string.sub(text, i, i)) > 32 then
+            newText = newText .. string.sub(text, i, i)
+            loopSkip = false
+        else
+            if not loopSkip then
+                newText = newText .. " "
+            end
+            loopSkip = true
+        end
+    end
+
+    return newText
+end
+
 function P.splitText(text, tabSize, maxColumn)
 
     local tab = ""
@@ -136,7 +163,6 @@ function P.create_directories(dirnames)
     end
 end
 
-
 function file_exists_v2(file)
     -- some error codes:
     -- 13 : EACCES - Permission denied
@@ -146,25 +172,25 @@ function file_exists_v2(file)
     --
     local isok, errstr, errcode = os.rename(file, file)
     if isok == nil then
-       if errcode == 13 then 
-          -- Permission denied, but it exists
-          return true
-       end
-       return false
+        if errcode == 13 then
+            -- Permission denied, but it exists
+            return true
+        end
+        return false
     end
     return true
-  end
-  
-  function dir_exists_v2(path)
+end
+
+function dir_exists_v2(path)
     return file_exists_v2(path .. "/")
-  end
+end
 
 function P.check_create_path(path)
     if not dir_exists_v2(path) then
         sasl.logInfo("Folder " .. path .. " does not exist... creating it")
         helpers.create_directories({path})
-        if not dir_exists_v2(path) then 
-            sasl.logWarning("Failure to create folder " .. path  )
+        if not dir_exists_v2(path) then
+            sasl.logWarning("Failure to create folder " .. path)
             return false
         end
     end

@@ -72,6 +72,14 @@ local function formatOFPDisplay(ofpData)
             end
 
         end
+
+        if fmc.isZibo then 
+            table.insert(t, "##41B342FF") -- change color
+            table.insert(t, string.format(messages.translation['ZIBOFMCREADY'], ofpData.origin.icao_code, ofpData.destination.icao_code, definitions.OFPSUFFIX))
+            table.insert(t, "#" .. definitions.textColorHtml) -- change color
+            table.insert(t, "")
+        end
+    
         if ofpData.params.ofp_layout ~= "LIDO" then
             table.insert(t, "##FFAF00FF") -- change color
             table.insert(t, string.format("OFP Layout: %s, " .. messages.translation['LIDOFORMAT1'], ofpData.params.ofp_layout))
@@ -82,7 +90,7 @@ local function formatOFPDisplay(ofpData)
         table.insert(t, "#" .. definitions.textColorHtml) -- change color
         table.insert(t,
             string.format("FMS CO ROUTE / Flight #:  %s%s%s / %s%s%s / %s %s", ofpData.origin.icao_code, ofpData.destination.icao_code, definitions.OFPSUFFIX,
-                ofpData.origin.iata_code, ofpData.destination.iata_code, definitions.OFPSUFFIX, ofpData.general.icao_airline, ofpData.general.flight_number))
+                ofpData.origin.iata_code, ofpData.destination.iata_code, definitions.OFPSUFFIX, helpers.ifnull(ofpData.general.icao_airline,""), helpers.ifnull(ofpData.general.flight_number,"")))
         table.insert(t, string.format("Aircraft:                 %s", ofpData.aircraft.name))
         table.insert(t, string.format("Airports:                 %s - %s", ofpData.origin.name, ofpData.destination.name))
         -- table.insert(t, helpers.cleanString(string.format("Route:                    %s/%s %s %s/%s", ofpData.origin.icao_code, ofpData.origin.plan_rwy, ofpData.general.route,
@@ -118,12 +126,12 @@ local function formatOFPDisplay(ofpData)
         table.insert(t, "")
         table.insert(t, string.format("Pax:                      %6d", ofpData.weights.pax_count))
         set(dr_pax_count, ofpData.weights.pax_count)
-        table.insert(t, string.format("Cargo:                   %s %s", helpers.format_thousand(ofpData.weights.cargo), ofpData.params.units))
-        set(dr_cargo, ofpData.weights.cargo)
-        table.insert(t, string.format("Payload:                 %s %s", helpers.format_thousand(ofpData.weights.payload), ofpData.params.units))
-        set(dr_payload, ofpData.weights.payload)
         table.insert(t, string.format("ZFW:                      %6.1f", ofpData.weights.est_zfw / 1000))
         set(dr_est_zfw, ofpData.weights.est_zfw)
+        table.insert(t, string.format("Cargo / Payload:             %s / %s %s", helpers.format_thousand(ofpData.weights.cargo), helpers.format_thousand(ofpData.weights.payload), ofpData.params.units))
+        set(dr_cargo, ofpData.weights.cargo)
+        -- table.insert(t, string.format("Payload:                 %s %s", helpers.format_thousand(ofpData.weights.payload), ofpData.params.units))
+        set(dr_payload, ofpData.weights.payload)
         table.insert(t, string.format("TO / LW weight:              %s / %s %s", helpers.format_thousand(ofpData.weights.est_tow), helpers.format_thousand(ofpData.weights.est_ldw),
             ofpData.params.units))
         set(dr_est_tow, ofpData.weights.est_tow)
@@ -141,7 +149,7 @@ local function formatOFPDisplay(ofpData)
         table.insert(t, string.format("TOC ISA Dev:                 %3d °C", ofpData.navlog.fix[iTOC].oat_isa_dev))
 
         table.insert(t, "")
-        if settings.appSettings.avwxtoken == "" then
+        if false then  -- TDB put here xp local weather is given by setup option
             local metarStr = string.format("METAR: %s", helpers.cleanString(ofpData.weather.orig_metar, false))
             local metarTable = helpers.splitText(metarStr, 7, 70)
             for i = 1, #metarTable, 1 do
@@ -233,10 +241,7 @@ local function fetchOFP(inUrl, inFilePath, inIsOk, inError)
         local fmsFileUrl = downloadfmsFileUrl .. P.OFP.values.OFP.fms_downloads.xpe.link
         sasl.net.downloadFileAsync(fmsFileUrl, definitions.XPFMSPATH .. xmlFile .. ".fms", fetchfmsFile)
 
-        P.fetchMetar(P.OFP.values.OFP.origin.icao_code)
-        P.fetchMetar(P.OFP.values.OFP.destination.icao_code)
-        P.fetchTaf(P.OFP.values.OFP.origin.icao_code)
-        P.fetchTaf(P.OFP.values.OFP.destination.icao_code)
+        P.fetchMetars(P.OFP.values.OFP.origin.icao_code,P.OFP.values.OFP.destination.icao_code)
 
         -- find TOC
         local iTOC = 1
@@ -257,8 +262,6 @@ local function fetchOFP(inUrl, inFilePath, inIsOk, inError)
         end
         P.OFP.values.OFP.maxStepClimb = max_altitude
         
-
-
         formatOFPDisplay(P.OFP.values.OFP)
         if settings.appSettings.upload2FMC then
             fmc.uploadToZiboFMC(P.OFP.values.OFP)
@@ -275,6 +278,79 @@ function P.fechOFP()
         P.OFP.values = {}
         P.OFP.output = {string.format("Fetching %s's OFP...", userid)}
         sasl.net.downloadFileAsync(url, definitions.YANSHCACHESPATH .. definitions.APPNAMEPREFIX .. "_ofp.tmp", fetchOFP)
+    end
+end
+
+local function fetchMetars(inUrl, inString, inIsOk, inError)
+    if onContentsDownloaded(inUrl, inString, inIsOk, inError) then
+
+        inString = helpers.ifnull(inString, "")  
+
+        local airport1 = P.OFP.values.OFP.origin.icao_code
+        local airport2 = P.OFP.values.OFP.destination.icao_code
+        local metar1 = "No METAR available"
+        local metar2 = metar1
+        local taf1 = "No TAF available"
+        local taf2 = taf1
+    
+        local current_pos = 1 -- start of the string
+        local current_row = ""
+        local rows = {}
+        while current_pos <= #inString do
+            local next_cr = string.find(inString,"\n", current_pos)
+            if next_cr == nil then next_cr = #inString+1 end
+            local row_ = string.sub(inString,current_pos,next_cr-1)
+            current_pos = next_cr + 1
+
+            if string.byte(string.sub(row_,1,1)) > 32 then
+                if #current_row >0 then table.insert(rows,current_row) end
+                current_row = row_
+            else
+                current_row = current_row .. row_
+            end              
+        end
+        if #current_row >0 then table.insert(rows,current_row) end -- last time 
+
+        for i = 1, #rows, 1 do 
+            if string.sub(rows[i], 1,4 ) == "TAF " then 
+                if string.find(rows[i], airport1 .. " ") ~= nil then taf1 = helpers.trimInnerSpace(string.gsub(rows[i],"TAF ","")) end
+                if string.find(rows[i], airport2 .. " ") ~= nil then taf2 = helpers.trimInnerSpace(string.gsub(rows[i],"TAF ","")) end
+            else
+                if string.sub(rows[i], 1,5 ) == airport1 .. " " then metar1 = helpers.trimInnerSpace(rows[i]) end
+                if string.sub(rows[i], 1,5 ) == airport2 .. " " then metar2 = helpers.trimInnerSpace(rows[i]) end
+            end
+        end
+
+
+        P.METAR.values[airport1] = metar1
+        P.METAR.values[airport2] = metar2
+        P.METAR.values['isError'] = false
+        P.METAR.values["taf_" .. airport1] = string.gsub(taf1, "<br>", "") -- some html tags may be here ????
+        P.METAR.values["taf_" .. airport2] = string.gsub(taf2, "<br>", "") -- some html tags may be here ????
+        P.METAR.values['taf_isError'] = false
+        formatOFPDisplay(P.OFP.values.OFP)
+    
+    else
+        
+        P.METAR.values['isError'] = true
+        P.METAR.values['taf_isError'] = true
+        formatOFPDisplay(P.OFP.values.OFP)
+    end
+    P.METAR.status = 2
+end
+
+function P.fetchMetars(airport1, airport2)
+    if string.len(airport1) > 0 and string.len(airport2) > 0 then
+        local url = string.format(definitions.AVWEATHERFURL, airport1, airport2)
+        P.METAR.status = 1
+        P.METAR.values[airport1] = nil
+        P.METAR.values[airport2] = nil
+        P.METAR.values['isError'] = false
+        P.METAR.values["taf_" .. airport1] = nil
+        P.METAR.values["taf_" .. airport2] = nil
+        P.METAR.values['taf_isError'] = false
+        formatOFPDisplay(P.OFP.values.OFP)
+        sasl.net.downloadFileContentsAsync(url, fetchMetars)
     end
 end
 

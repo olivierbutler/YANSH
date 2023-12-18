@@ -92,22 +92,6 @@ wdef = {
         y = hSize - 60,
         w = 120,
         h = definitions.buttonHeight
-    },
-    avwxtoken = {
-        t = messages.translation['AVWXTOKEN'],
-        value =  string.sub(settings.appSettings.avwxtoken, 1, 5) .. "******",
-        x = 10,
-        y = hSize - 90,
-        w = 200,
-        h = definitions.lineHeight * 1.5,
-        isFocused = false
-    },
-    avwxtokenPaste = {
-        t = messages.translation['PASTE'],
-        x = 400,
-        y = hSize - 90,
-        w = 120,
-        h = definitions.buttonHeight
     }
 }
 
@@ -173,32 +157,6 @@ components = {interactive {
         interactive_datapanel:setIsVisible(true)
         setup_datapanel:setIsVisible(false)
     end
-}, interactive {
-    position = {wdef.sbUserPaste.x, wdef.sbUserPaste.y, wdef.sbUserPaste.w, wdef.sbUserPaste.h}, -- simbrief user field paste button
-    cursor = definitions.cursor,
-    onMouseDown = function(component, x, y, button, parentX, parentY)
-        local paste = sasl.getClipboardText()
-        if paste ~= nil and paste ~= "" then
-            sasl.logDebug(string.format("Paste Sb UserName %s", paste))
-            wdef.sbUser.value = paste
-            settings.appSettings.sbuser = paste
-            settings.writeSettings(settings.appSettings)
-        end
-    end
-
-}, interactive {
-    position = {wdef.avwxtokenPaste.x, wdef.avwxtokenPaste.y, wdef.avwxtokenPaste.w, wdef.avwxtokenPaste.h}, -- simbrief user field paste button
-    cursor = definitions.cursor,
-    onMouseDown = function(component, x, y, button, parentX, parentY)
-        local paste = sasl.getClipboardText()
-        if paste ~= nil and paste ~= "" then
-            sasl.logDebug(string.format("Paste Awvx Token %s", paste))
-            wdef.avwxtoken.value = string.sub(paste, 1, 5) .. "******"
-            settings.appSettings.avwxtoken = paste
-            settings.writeSettings(settings.appSettings)
-        end
-    end
-
 }}
 
 function update()
@@ -215,10 +173,8 @@ function draw()
     windows.drawWindowTemplate(wdef.mainWindow)
     windows.drawButton(wdef.closeButton, true)
     windows.drawButton(wdef.sbUserPaste, true)
-    windows.drawButton(wdef.avwxtokenPaste, true)
 
     windows.inputTextBox(wdef.sbUser)
-    windows.inputTextBox(wdef.avwxtoken)
 
     windows.drawCheckBox(wdef.ziboFmc)
     windows.drawCheckBox(wdef.debugMode)
