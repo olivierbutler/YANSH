@@ -28,7 +28,7 @@ This plugins upload Simbrief OFP to Zibo's B738 FMC (formely Simbrief Helper Enh
     ~~- go to avwx.rest and register for free~~
     ~~- get you own API token at the page account.avwx.rest/tokens~~
     ~~- then paste in the YANSH's setup window~~
-    ~~- At any time METARs can be updated by clicking on the "Refresh Metar" button ~~
+    - At any time METARs can be updated by clicking on the "Refresh Metar" button
 
 4. Field of View angle keeper
     The Field of View angle (FoV) is a global setting of X-plane. This
