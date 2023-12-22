@@ -13,7 +13,8 @@ definitions = P -- package name
 -- P.VERSION = "3.8" -- clear the scratchpad before uploading, use the max cruise altitude instead of the initial altitude, display now also the flight number and the landing weight
 -- P.VERSION = "3.9" -- add VR borders display option,  fetch/uplink OFP button can be assign to as key, b737x files are not downloaded if  not B738 aircraft
 -- P.VERSION = "3.10" -- replace avwx service by aviationweather.gov (no registration needed)
-P.VERSION = "3.10"
+-- P.VERSION = "3.11" -- Fix TOC Temp OTA value on FMC ( TOC Temp ISA was pushed instead )
+P.VERSION = "3.11"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW

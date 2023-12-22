@@ -71,6 +71,7 @@ https://forums.x-plane.org/index.php?/files/file/86783-yansh-yet-another-simbrie
 2. xml2lua module by Manoel Campos (https://github.com/manoelcampos/xml2lua)
 
 #### History
+- 3.11 Fix TOC Temp OTA value on FMC ( TOC Temp ISA was pushed instead )
 - 3.10 Replace avwx service by aviationweather.gov (no registration needed)
 - 3.9 Add VR borders display option,  fetch/uplink OFP button can be assign to as key, b737x files are not downloaded if not B738 aircraft
 - 3.8 Clear the scratchpad before uploading, use the max cruise altitude instead of the initial altitude, display now also the flight number and the landing weight

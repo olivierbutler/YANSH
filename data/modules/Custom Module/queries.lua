@@ -288,9 +288,9 @@ local function fetchMetars(inUrl, inString, inIsOk, inError)
 
         local airport1 = P.OFP.values.OFP.origin.icao_code
         local airport2 = P.OFP.values.OFP.destination.icao_code
-        local metar1 = "No METAR available"
+        local metar1 = nil
         local metar2 = metar1
-        local taf1 = "No TAF available"
+        local taf1 = nil
         local taf2 = taf1
     
         local current_pos = 1 -- start of the string
@@ -312,14 +312,27 @@ local function fetchMetars(inUrl, inString, inIsOk, inError)
         if #current_row >0 then table.insert(rows,current_row) end -- last time 
 
         for i = 1, #rows, 1 do 
-            if string.sub(rows[i], 1,4 ) == "TAF " then 
-                if string.find(rows[i], airport1 .. " ") ~= nil then taf1 = helpers.trimInnerSpace(string.gsub(rows[i],"TAF ","")) end
-                if string.find(rows[i], airport2 .. " ") ~= nil then taf2 = helpers.trimInnerSpace(string.gsub(rows[i],"TAF ","")) end
-            else
-                if string.sub(rows[i], 1,5 ) == airport1 .. " " then metar1 = helpers.trimInnerSpace(rows[i]) end
-                if string.sub(rows[i], 1,5 ) == airport2 .. " " then metar2 = helpers.trimInnerSpace(rows[i]) end
+            if string.find(rows[i], airport1 .. " ") ~= nil then
+                if metar1 == nil then
+                    metar1 = helpers.trimInnerSpace(rows[i]) 
+                else
+                    taf1 = helpers.trimInnerSpace(string.gsub(rows[i],"TAF ",""))
+                end
+            end
+
+            if string.find(rows[i], airport2 .. " ") ~= nil then
+                if metar2 == nil then
+                    metar2 = helpers.trimInnerSpace(rows[i]) 
+                else
+                    taf2 = helpers.trimInnerSpace(string.gsub(rows[i],"TAF ",""))
+                end
             end
         end
+
+        if metar1 == nil then metar1 = "No METAR available" end
+        if metar2 == nil then metar2 = "No METAR available" end
+        if taf1 == nil then taf1 = "No TAF available" end
+        if taf2 == nil then taf2 = "No TAF available" end
 
 
         P.METAR.values[airport1] = metar1

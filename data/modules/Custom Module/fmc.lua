@@ -134,7 +134,7 @@ function P.uploadToZiboFMC(ofpData)
 
         pushKeyToBuffer("rte", ofpData.origin.icao_code .. ofpData.destination.icao_code .. definitions.OFPSUFFIX, "2L")
         pushKeyToBuffer("", ofpData.origin.plan_rwy, "3L")
-        pushKeyToBuffer("", ofpData.general.flight_number, "2R")
+        pushKeyToBuffer("", string.sub(ofpData.general.flight_number,1,8) , "2R")
         pushKeyToBuffer("init_ref", "", "6L")
         pushKeyToBuffer("3L", "", "")
         if is_plan_fuel_enable() then 
@@ -148,7 +148,7 @@ function P.uploadToZiboFMC(ofpData)
 --        pushKeyToBuffer("", string.format("%1.0f", ofpData.general.initial_altitude / 100), "1R")
         pushKeyToBuffer("", string.format("%1.0f", ofpData.maxStepClimb / 100), "1R")
         pushKeyToBuffer("", string.format("%03d/%03d", ofpData.navlog.fix[iTOC].wind_dir, ofpData.navlog.fix[iTOC].wind_spd), "2R")
-        pushKeyToBuffer("", string.format("%dC", ofpData.navlog.fix[iTOC].oat_isa_dev), "3R")
+        pushKeyToBuffer("", string.format("%dC", ofpData.navlog.fix[iTOC].oat), "3R")
         P.fmcQueueLocked = false
     else
         sasl.logInfo("Zibo B737 not detected : not computing the FMC")
