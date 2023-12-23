@@ -71,6 +71,7 @@ https://forums.x-plane.org/index.php?/files/file/86783-yansh-yet-another-simbrie
 2. xml2lua module by Manoel Campos (https://github.com/manoelcampos/xml2lua)
 
 #### History
+- 3.12 Fix Regression 'Paste' Button was not working anymore
 - 3.11 Fix TOC Temp OTA value on FMC ( TOC Temp ISA was pushed instead )
 - 3.10 Replace avwx service by aviationweather.gov (no registration needed)
 - 3.9 Add VR borders display option,  fetch/uplink OFP button can be assign to as key, b737x files are not downloaded if not B738 aircraft

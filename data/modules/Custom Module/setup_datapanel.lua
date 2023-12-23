@@ -157,6 +157,19 @@ components = {interactive {
         interactive_datapanel:setIsVisible(true)
         setup_datapanel:setIsVisible(false)
     end
+}, interactive {
+    position = {wdef.sbUserPaste.x, wdef.sbUserPaste.y, wdef.sbUserPaste.w, wdef.sbUserPaste.h}, -- simbrief user field paste button
+    cursor = definitions.cursor,
+    onMouseDown = function(component, x, y, button, parentX, parentY)
+        local paste = sasl.getClipboardText()
+        if paste ~= nil and paste ~= "" then
+            sasl.logDebug(string.format("Paste Sb UserName %s", paste))
+            wdef.sbUser.value = paste
+            settings.appSettings.sbuser = paste
+            settings.writeSettings(settings.appSettings)
+        end
+    end
+
 }}
 
 function update()

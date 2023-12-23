@@ -14,7 +14,8 @@ definitions = P -- package name
 -- P.VERSION = "3.9" -- add VR borders display option,  fetch/uplink OFP button can be assign to as key, b737x files are not downloaded if  not B738 aircraft
 -- P.VERSION = "3.10" -- replace avwx service by aviationweather.gov (no registration needed)
 -- P.VERSION = "3.11" -- Fix TOC Temp OTA value on FMC ( TOC Temp ISA was pushed instead )
-P.VERSION = "3.11"
+-- P.VERSION = "3.12" -- Fix Regression 'Paste' Button was not working anymore
+P.VERSION = "3.12"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
