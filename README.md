@@ -69,8 +69,10 @@ https://forums.x-plane.org/index.php?/files/file/86783-yansh-yet-another-simbrie
 #### Credits
 1. Original script by Alexander Garzon (https://forums.x-plane.org/index.php?/forums/topic/201318-simbrief-helper/)
 2. xml2lua module by Manoel Campos (https://github.com/manoelcampos/xml2lua)
+3. json module by rxi (https://github.com/rxi/json.lua)
 
 #### History
+- 3.13 QNH is displayed in hPA and inHg (useful for old aircraft), SASL update to v3.17, YANSH can now be upgraded with SkunkCrafts Updater Standalone client 
 - 3.12 Fix Regression 'Paste' Button was not working anymore
 - 3.11 Fix TOC Temp OTA value on FMC ( TOC Temp ISA was pushed instead )
 - 3.10 Replace avwx service by aviationweather.gov (no registration needed)

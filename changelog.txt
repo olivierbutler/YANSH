@@ -1,4 +1,20 @@
 ----------------------------------------------------------
+SASL 3.17.0 (XP11.25+ support)
+----------------------------------------------------------
+
+-- Update LuaJIT to the latest version
+-- Tune internal JIT parameters to circumvent performance issues for some complex projects
+-- Optimize memory usage a little bit for loading Lua scripts (Commercial version)
+-- SASL project reports scripts loading time in Log
+-- Fix managing OpenGL state when rendering into targets in "update" functions
+-- Fix "request" function not creating new script instance when it should
+-- Remove registering SASL developer commands for Commercial version
+-- Context windows will reposition themselves into visible areas only when window visibility changes
+-- Add function to treat project warnings as errors ("setLuaWarningsAsErrors")
+-- Change default context windows decoration colors a little bit
+-- Change OpenAL-soft backend on Windows OS 
+
+----------------------------------------------------------
 SASL 3.16.4 (XP11.25+ support)
 ----------------------------------------------------------
 

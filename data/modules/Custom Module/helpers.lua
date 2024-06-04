@@ -25,9 +25,10 @@ function P.timeConvert(seconds, sep)
     if seconds <= 0 then
         return "no data";
     else
-        hours = string.format("%2.f", math.floor(seconds / 3600));
-        mins = string.format("%02.f", math.floor(seconds / 60 - (hours * 60)));
-        return hours .. sep .. mins
+        -- hours = string.format("%2.f", math.floor(seconds / 3600));
+        -- mins = string.format("%02.f", math.floor(seconds / 60 - (hours * 60)));
+        -- return hours .. sep .. mins
+        return string.format("%2d%s%02d", math.floor(seconds / 3600), sep, math.floor(seconds / 60) % 60)
     end
 end
 

@@ -15,7 +15,8 @@ definitions = P -- package name
 -- P.VERSION = "3.10" -- replace avwx service by aviationweather.gov (no registration needed)
 -- P.VERSION = "3.11" -- Fix TOC Temp OTA value on FMC ( TOC Temp ISA was pushed instead )
 -- P.VERSION = "3.12" -- Fix Regression 'Paste' Button was not working anymore
-P.VERSION = "3.12"
+-- P.VERSION = "3.13" -- Display METAR's QNH in Hpa and inHg ( useful for old aircraft) 
+P.VERSION = "3.13"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
@@ -33,12 +34,14 @@ P.YANSHCACHESPATH = P.XPOUTPUTPATH .. "caches" .. P.OSSEPARATOR .. P.APPNAMEPREF
 P.XPFMSPATH = P.XPOUTPUTPATH .. "FMS plans" .. P.OSSEPARATOR
 P.XPFMSPATHEXIST = false
 P.XPRESSOURCESPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Resources" .. P.OSSEPARATOR
-P.GITHUBURL = "https://raw.githubusercontent.com/olivierbutler/YANSH/main/data/modules/configuration/version.ini" 
+P.GITHUBURL = "https://raw.githubusercontent.com/olivierbutler/YANSH/main/data/modules/configuration/version.ini"
+P.GITHUBURLJSON = "https://api.github.com/repos/olivierbutler/YANSH/releases/latest" 
 P.SIMBRIEFURL = "https://www.simbrief.com/api/xml.fetcher.php?username=%s"
 P.SIMBRIEFOFPURL = "https://www.simbrief.com/system/briefing.fmsdl.php?formatget=flightplans/"
 P.AWVXURL = "https://avwx.rest/api/metar/%s?token=%s&reporting=false&format=xml&filter=sanitized"
 P.AWVXTAFURL = "https://avwx.rest/api/taf/%s?token=%s&reporting=false&format=xml&filter=sanitized"
 P.AVWEATHERFURL = "https://aviationweather.gov/api/data/metar?taf=true&format=raw&ids=%s,%s"
+P.AVWEATHERFURLJSON = "https://aviationweather.gov/api/data/metar?taf=true&format=json&ids=%s,%s"
 P.APPNAMEPREFIXLONG = "Yet ANother Simbrief Helper"
 P.OFPSUFFIX = "01"
 P.ZIBOFILE = "b738x"

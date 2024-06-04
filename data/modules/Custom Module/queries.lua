@@ -6,6 +6,7 @@ require("settings")
 require("helpers")
 fmc = require("fmc")
 require("messages")
+json = require("json")
 
 --- weights/pax count/crz altitude
 local dr_initial_altitude = createGlobalPropertyi(definitions.APPNAMEPREFIX .. "/sb/general/initial_altitude", 0, false, true, true)
@@ -183,6 +184,9 @@ local function formatOFPDisplay(ofpData)
                     for i = 1, #metarTable, 1 do
                         table.insert(t, metarTable[i])
                     end
+
+                    table.insert(t, string.format("QNH:   %s %s", ofpData.origin.icao_code, P.METAR.values["qnh_" .. ofpData.origin.icao_code]))
+
                     local tafStr = string.format("TAF:   %s", P.METAR.values["taf_" .. ofpData.origin.icao_code])
                     local tafStr = helpers.splitText(tafStr, 7, 70)
                     for i = 1, #tafStr, 1 do
@@ -199,6 +203,9 @@ local function formatOFPDisplay(ofpData)
                     for i = 1, #metarTable, 1 do
                         table.insert(t, metarTable[i])
                     end
+
+                    table.insert(t, string.format("QNH:   %s %s", ofpData.destination.icao_code, P.METAR.values["qnh_" .. ofpData.destination.icao_code]))
+
                     local tafStr = string.format("TAF:   %s", P.METAR.values["taf_" .. ofpData.destination.icao_code])
                     local tafStr = helpers.splitText(tafStr, 7, 70)
                     for i = 1, #tafStr, 1 do
@@ -352,9 +359,90 @@ local function fetchMetars(inUrl, inString, inIsOk, inError)
     P.METAR.status = 2
 end
 
+local function qnh_hpa_inhg(qnh)
+    local inhg = qnh / 33.864
+    return string.format("%4.0f / A%2.2f", qnh,inhg)
+end
+
+local function fetchMetarjson(inUrl, inString, inIsOk, inError)
+    if onContentsDownloaded(inUrl, inString, inIsOk, inError) then
+
+        local json_ ={}
+
+        inString = helpers.ifnull(inString, "")  
+        pcall(function()
+            json_ = json.decode(inString)
+        end)
+
+        local airport1 = P.OFP.values.OFP.origin.icao_code
+        local airport2 = P.OFP.values.OFP.destination.icao_code
+        local metar1 = "No METAR available"
+        local metar2 = metar1
+        local taf1 = "No TAF available"
+        local taf2 = taf1
+        local qnh1 = "No QNH available"
+        local qnh2 = qnh1
+    
+
+
+        if #json_ >= 1 then
+            if json_[1].icaoId == airport1 then 
+                metar1 = helpers.trimInnerSpace(json_[1].rawOb)
+                if json_[1].rawTaf ~= nil then 
+                    taf1 = helpers.trimInnerSpace(string.gsub(json_[1].rawTaf,"TAF ",""))
+                end
+                qnh1 = qnh_hpa_inhg(json_[1].altim)
+            end    
+            if json_[1].icaoId == airport2 then 
+                metar2 = helpers.trimInnerSpace(json_[1].rawOb)
+                if json_[1].rawTaf ~= nil then 
+                    taf2 = helpers.trimInnerSpace(string.gsub(json_[1].rawTaf,"TAF ",""))
+                end
+                qnh2 = qnh_hpa_inhg(json_[1].altim)
+            end
+        end
+
+        if #json_ >= 2 then
+            if json_[2].icaoId == airport1 then 
+                metar1 = helpers.trimInnerSpace(json_[2].rawOb)
+                if json_[2].rawTaf ~= nil then 
+                    taf1 = helpers.trimInnerSpace(string.gsub(json_[2].rawTaf,"TAF ",""))
+                end
+                qnh1 = qnh_hpa_inhg(json_[2].altim)
+            end    
+            if json_[2].icaoId == airport2 then 
+                metar2 = helpers.trimInnerSpace(json_[2].rawOb)
+                if json_[2].rawTaf ~= nil then 
+                    taf2 = helpers.trimInnerSpace(string.gsub(json_[2].rawTaf,"TAF ",""))
+                end
+                qnh2 = qnh_hpa_inhg(json_[2].altim)
+            end
+        end
+
+
+        P.METAR.values[airport1] = metar1
+        P.METAR.values[airport2] = metar2
+        P.METAR.values["qnh_" .. airport1] = qnh1
+        P.METAR.values["qnh_" .. airport2] = qnh2
+        P.METAR.values['isError'] = false
+        P.METAR.values["taf_" .. airport1] = string.gsub(taf1, "<br>", "") -- some html tags may be here ????
+        P.METAR.values["taf_" .. airport2] = string.gsub(taf2, "<br>", "") -- some html tags may be here ????
+        P.METAR.values['taf_isError'] = false
+        formatOFPDisplay(P.OFP.values.OFP)
+    
+    else
+        
+        P.METAR.values['isError'] = true
+        P.METAR.values['taf_isError'] = true
+        formatOFPDisplay(P.OFP.values.OFP)
+    end
+    P.METAR.status = 2
+end
+
+
 function P.fetchMetars(airport1, airport2)
     if string.len(airport1) > 0 and string.len(airport2) > 0 then
-        local url = string.format(definitions.AVWEATHERFURL, airport1, airport2)
+        local url = string.format(definitions.AVWEATHERFURLJSON, airport1, airport2)
         P.METAR.status = 1
         P.METAR.values[airport1] = nil
         P.METAR.values[airport2] = nil
@@ -363,7 +451,7 @@ function P.fetchMetars(airport1, airport2)
         P.METAR.values["taf_" .. airport2] = nil
         P.METAR.values['taf_isError'] = false
         formatOFPDisplay(P.OFP.values.OFP)
-        sasl.net.downloadFileContentsAsync(url, fetchMetars)
+        sasl.net.downloadFileContentsAsync(url, fetchMetarjson)
     end
 end
 
