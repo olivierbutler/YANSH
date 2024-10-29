@@ -16,7 +16,8 @@ definitions = P -- package name
 -- P.VERSION = "3.11" -- Fix TOC Temp OTA value on FMC ( TOC Temp ISA was pushed instead )
 -- P.VERSION = "3.12" -- Fix Regression 'Paste' Button was not working anymore
 -- P.VERSION = "3.13" -- Display METAR's QNH in Hpa and inHg ( useful for old aircraft) 
-P.VERSION = "3.13"
+-- P.VERSION = "3.14" -- Display keyboard shortcut in the menu 
+P.VERSION = "3.14"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW

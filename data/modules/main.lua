@@ -118,11 +118,10 @@ end
 menu_master = sasl.appendMenuItem(PLUGINS_MENU_ID, definitions.APPNAMEPREFIXLONG)
 -- make our menu entry a submenu
 menu_main = sasl.createMenu("", PLUGINS_MENU_ID, menu_master)
--- add menu entry
-menu_action = sasl.appendMenuItem(menu_main, "Show/hide " .. definitions.APPNAMEPREFIX, show_hide)
 
 my_command = sasl.createCommand(definitions.APPNAMEPREFIX .. "/showtoggle", "Show/Hide the " .. definitions.APPNAMEPREFIX .. " window")
 sasl.registerCommandHandler(my_command, 0, show_hide_cmd)
+menu_action = sasl.appendMenuItemWithCommand(menu_main, "Show/hide " .. definitions.APPNAMEPREFIX, my_command)
 
 my_command_fetch = sasl.createCommand(definitions.APPNAMEPREFIX .. "/fetchOFP", "Fetch/Uplink the OFP" )
 sasl.registerCommandHandler(my_command_fetch, 0, fetch_ofp_cmd)
