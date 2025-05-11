@@ -17,7 +17,8 @@ definitions = P -- package name
 -- P.VERSION = "3.12" -- Fix Regression 'Paste' Button was not working anymore
 -- P.VERSION = "3.13" -- Display METAR's QNH in Hpa and inHg ( useful for old aircraft) 
 -- P.VERSION = "3.14" -- Display keyboard shortcut in the menu 
-P.VERSION = "3.14"
+-- P.VERSION = "3.15" -- Add UMFC simbrief dowmload for B748 
+P.VERSION = "3.15"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
@@ -32,6 +33,7 @@ P.APPNAMEPREFIX = sasl.getProjectName()
 P.XPOUTPUTPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Output" .. P.OSSEPARATOR
 P.XPCACHESPATH = P.XPOUTPUTPATH .. "caches" .. P.OSSEPARATOR
 P.YANSHCACHESPATH = P.XPOUTPUTPATH .. "caches" .. P.OSSEPARATOR .. P.APPNAMEPREFIX .. ".cache".. P.OSSEPARATOR 
+P.XPUFMCSPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Custom Data" .. P.OSSEPARATOR .. "UFMC" .. P.OSSEPARATOR .. "FlightPlans" .. P.OSSEPARATOR
 P.XPFMSPATH = P.XPOUTPUTPATH .. "FMS plans" .. P.OSSEPARATOR
 P.XPFMSPATHEXIST = false
 P.XPRESSOURCESPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Resources" .. P.OSSEPARATOR

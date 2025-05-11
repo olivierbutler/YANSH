@@ -29,6 +29,13 @@ if not definitions.XPFMSPATHEXIST then
     sasl.logWarning("Fail to create fms folder, Fetch button disabled")
 end
 
+if definitions.XPFMSPATHEXIST then
+    definitions.XPFMSPATHEXIST = helpers.check_create_path(definitions.XPUFMCSPATH)
+    if not definitions.XPFMSPATHEXIST then
+        sasl.logWarning("Fail to create UMFC folder, Fetch button disabled")
+    end
+end
+
 local xRoot, yRoot, wRoot, hRoot = sasl.windows.getMonitorBoundsOS(0)
 
 local winRoot = contextWindow {

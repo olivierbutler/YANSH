@@ -248,6 +248,13 @@ local function fetchOFP(inUrl, inFilePath, inIsOk, inError)
         local fmsFileUrl = downloadfmsFileUrl .. P.OFP.values.OFP.fms_downloads.xpe.link
         sasl.net.downloadFileAsync(fmsFileUrl, definitions.XPFMSPATH .. xmlFile .. ".fms", fetchfmsFile)
 
+        -- support for UMFC
+        if P.OFP.values.OFP.aircraft.icao_code == 'B748' then
+            sasl.logInfo("copying UFMC file")
+            fmsFileUrl = downloadfmsFileUrl .. P.OFP.values.OFP.fms_downloads.ufc.link
+            sasl.net.downloadFileAsync(fmsFileUrl, definitions.XPUFMCSPATH .. xmlFile .. ".ufmc", fetchfmsFile)
+        end
+
         P.fetchMetars(P.OFP.values.OFP.origin.icao_code,P.OFP.values.OFP.destination.icao_code)
 
         -- find TOC
