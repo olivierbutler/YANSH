@@ -245,15 +245,21 @@ local function fetchOFP(inUrl, inFilePath, inIsOk, inError)
             helpers.cp_file(inFilePath, xmlZiboFilePath) -- xml file for Zibo RC5.2+ datalink only if OFP is for B738
         end
         local downloadfmsFileUrl = definitions.SIMBRIEFOFPURL -- should use this, but is not working -- P.OFP.values.OFP.fms_downloads.directory 
+        if not P.OFP.values.OFP.fms_downloads.xpe or not P.OFP.values.OFP.fms_downloads.ufc then
+            sasl.logInfo("xpe or ufc link not provided")
+            P.OFP.output = {string.format("Unable to download the OFP, check on the simbrief webpage")}
+            P.OFP.status = 2
+            return
+        end    
         local fmsFileUrl = downloadfmsFileUrl .. P.OFP.values.OFP.fms_downloads.xpe.link
         sasl.net.downloadFileAsync(fmsFileUrl, definitions.XPFMSPATH .. xmlFile .. ".fms", fetchfmsFile)
 
         -- support for UMFC
-        if P.OFP.values.OFP.aircraft.icao_code == 'B748' then
+--                if P.OFP.values.OFP.aircraft.icao_code == 'B748' then
             sasl.logInfo("copying UFMC file")
             fmsFileUrl = downloadfmsFileUrl .. P.OFP.values.OFP.fms_downloads.ufc.link
             sasl.net.downloadFileAsync(fmsFileUrl, definitions.XPUFMCSPATH .. xmlFile .. ".ufmc", fetchfmsFile)
-        end
+--        end
 
         P.fetchMetars(P.OFP.values.OFP.origin.icao_code,P.OFP.values.OFP.destination.icao_code)
 
