@@ -123,6 +123,12 @@ function P.uploadToZiboFMC(ofpData)
         -- find TOC
         local iTOC = ofpData.iTOC
         
+        -- Cap cruise altitude to B738 ceiling (FL410) to avoid FMC reject when Simbrief gives higher)
+        local cruiseAlt = ofpData.maxStepClimb
+        if cruiseAlt > 41000 then
+            sasl.logInfo(string.format("Cruise altitude %dft above B738 limit, capping to 41000", cruiseAlt))
+            cruiseAlt = 41000
+        end
 
         sasl.logInfo("Zibo B737 status ok : computing the FMC")
         P.fmcQueueLocked = true
@@ -134,7 +140,31 @@ function P.uploadToZiboFMC(ofpData)
 
         pushKeyToBuffer("rte", ofpData.origin.icao_code .. ofpData.destination.icao_code .. definitions.OFPSUFFIX, "2L")
         pushKeyToBuffer("", ofpData.origin.plan_rwy, "3L")
-        pushKeyToBuffer("", string.sub(ofpData.general.flight_number,1,8) , "2R")
+        local flightNo = ""
+        local airline = ""
+        if type(ofpData.general) == "table" then
+            flightNo = ofpData.general.flight_number or ""
+            airline = ofpData.general.icao_airline or ""
+        end
+        flightNo = string.gsub(flightNo, "%s+", "")
+        airline = string.gsub(airline, "%s+", "")
+        local fmcFlightNo = flightNo
+        if airline ~= "" and flightNo ~= "" then
+            local flightNoUpper = string.upper(flightNo)
+            local airlineUpper = string.upper(airline)
+            local hasPrefix = false
+            if string.sub(flightNoUpper, 1, #airlineUpper) == airlineUpper then
+                hasPrefix = true
+            elseif string.match(flightNoUpper, "^[A-Z]") then
+                hasPrefix = true
+            elseif string.match(flightNoUpper, "^[0-9][A-Z]") then
+                hasPrefix = true
+            end
+            if not hasPrefix then
+                fmcFlightNo = airline .. flightNo
+            end
+        end
+        pushKeyToBuffer("", string.sub(fmcFlightNo, 1, 8), "2R")
         pushKeyToBuffer("init_ref", "", "6L")
         pushKeyToBuffer("3L", "", "")
         if is_plan_fuel_enable() then 
@@ -146,7 +176,7 @@ function P.uploadToZiboFMC(ofpData)
         end 
         pushKeyToBuffer("", string.format("%1d", ofpData.general.costindex), "5L")
 --        pushKeyToBuffer("", string.format("%1.0f", ofpData.general.initial_altitude / 100), "1R")
-        pushKeyToBuffer("", string.format("%1.0f", ofpData.maxStepClimb / 100), "1R")
+        pushKeyToBuffer("", string.format("%1.0f", cruiseAlt / 100), "1R")
         pushKeyToBuffer("", string.format("%03d/%03d", ofpData.navlog.fix[iTOC].wind_dir, ofpData.navlog.fix[iTOC].wind_spd), "2R")
         pushKeyToBuffer("", string.format("%dC", ofpData.navlog.fix[iTOC].oat), "3R")
         P.fmcQueueLocked = false
