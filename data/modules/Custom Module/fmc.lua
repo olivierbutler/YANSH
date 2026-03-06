@@ -93,6 +93,28 @@ local function pushKeyToBuffer(startKey, inputString, endKey)
 
 end
 
+-- Normalize OFP fields to plain text so unexpected XML node types don't crash gsub/string ops.
+local function normalizeOFPField(value, fieldName)
+    if type(value) == "string" then
+        return value
+    end
+    if type(value) == "number" then
+        return tostring(value)
+    end
+    if type(value) == "table" then
+        if type(value[1]) == "string" then
+            return value[1]
+        end
+        if type(value._text) == "string" then
+            return value._text
+        end
+    end
+    if value ~= nil then
+        sasl.logWarning(string.format("Unexpected OFP type for %s: %s", fieldName, type(value)))
+    end
+    return ""
+end
+
 local function is_plan_fuel_enable()
     local fuel_plan_option = globalProperty("laminar/B738/plan_fuel")
     local option_enable = get(fuel_plan_option)
@@ -143,8 +165,8 @@ function P.uploadToZiboFMC(ofpData)
         local flightNo = ""
         local airline = ""
         if type(ofpData.general) == "table" then
-            flightNo = ofpData.general.flight_number or ""
-            airline = ofpData.general.icao_airline or ""
+            flightNo = normalizeOFPField(ofpData.general.flight_number, "general.flight_number")
+            airline = normalizeOFPField(ofpData.general.icao_airline, "general.icao_airline")
         end
         flightNo = string.gsub(flightNo, "%s+", "")
         airline = string.gsub(airline, "%s+", "")
