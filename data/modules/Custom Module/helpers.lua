@@ -10,6 +10,138 @@ function P.cp_file(source, destination)
     inp:close()
 end
 
+local function splitLines(text)
+    local lines = {}
+    if text == nil or text == "" then
+        return lines
+    end
+    text = string.gsub(text, "\r\n", "\n")
+    text = string.gsub(text, "\r", "\n")
+    for line in string.gmatch(text, "([^\n]*)\n?") do
+        if line == "" and #lines > 0 and lines[#lines] == "" then
+            break
+        end
+        table.insert(lines, line)
+    end
+    return lines
+end
+
+local function parseFmsWaypointLine(line)
+    local fields = {}
+    for field in string.gmatch(line, "%S+") do
+        table.insert(fields, field)
+    end
+    if #fields ~= 6 then
+        return nil
+    end
+    if tonumber(fields[1]) == nil or tonumber(fields[4]) == nil or tonumber(fields[5]) == nil or tonumber(fields[6]) == nil then
+        return nil
+    end
+    return {
+        waypointType = fields[1],
+        ident = fields[2],
+        via = fields[3],
+        altitude = fields[4],
+        latitude = fields[5],
+        longitude = fields[6],
+        raw = line
+    }
+end
+
+local function shouldDedupFmsWaypoint(previousWaypoint, currentWaypoint)
+    if previousWaypoint == nil or currentWaypoint == nil then
+        return false
+    end
+    if previousWaypoint.ident ~= currentWaypoint.ident then
+        return false
+    end
+    if previousWaypoint.waypointType ~= currentWaypoint.waypointType then
+        return false
+    end
+    if previousWaypoint.altitude ~= currentWaypoint.altitude then
+        return false
+    end
+    if previousWaypoint.latitude ~= currentWaypoint.latitude or previousWaypoint.longitude ~= currentWaypoint.longitude then
+        return false
+    end
+    if previousWaypoint.via == "ADEP" or previousWaypoint.via == "ADES" or currentWaypoint.via == "ADEP" or currentWaypoint.via == "ADES" then
+        return false
+    end
+    if string.sub(previousWaypoint.ident, 1, 2) == "RW" or string.sub(currentWaypoint.ident, 1, 2) == "RW" then
+        return false
+    end
+    return previousWaypoint.via == "DRCT" or currentWaypoint.via == "DRCT"
+end
+
+function P.dedupConsecutiveFmsWaypoints(filePath)
+    local file = io.open(filePath, "rb")
+    if file == nil then
+        sasl.logWarning("Unable to open FMS file for dedup: " .. filePath)
+        return 0
+    end
+
+    local contents = file:read("*all")
+    file:close()
+
+    local newLine = "\n"
+    if string.find(contents, "\r\n", 1, true) ~= nil then
+        newLine = "\r\n"
+    end
+
+    local lines = splitLines(contents)
+    if #lines == 0 then
+        return 0
+    end
+
+    local outputLines = {}
+    local removedCount = 0
+    local previousWaypoint = nil
+
+    for i = 1, #lines do
+        local currentLine = lines[i]
+        local currentWaypoint = parseFmsWaypointLine(currentLine)
+        if shouldDedupFmsWaypoint(previousWaypoint, currentWaypoint) then
+            removedCount = removedCount + 1
+            if previousWaypoint.via == "DRCT" and currentWaypoint.via ~= "DRCT" then
+                outputLines[#outputLines] = currentLine
+                previousWaypoint = currentWaypoint
+            end
+        else
+            table.insert(outputLines, currentLine)
+            previousWaypoint = currentWaypoint
+        end
+    end
+
+    if removedCount == 0 then
+        return 0
+    end
+
+    local enrouteCount = 0
+    for i = 1, #outputLines do
+        if parseFmsWaypointLine(outputLines[i]) ~= nil then
+            enrouteCount = enrouteCount + 1
+        end
+    end
+
+    for i = 1, #outputLines do
+        if string.match(outputLines[i], "^NUMENR%s+") ~= nil then
+            outputLines[i] = string.format("NUMENR %d", enrouteCount)
+            break
+        end
+    end
+
+    file = io.open(filePath, "wb")
+    if file == nil then
+        sasl.logWarning("Unable to write deduped FMS file: " .. filePath)
+        return 0
+    end
+    file:write(table.concat(outputLines, newLine))
+    file:close()
+
+    sasl.logInfo(string.format("Deduped %d consecutive waypoint duplicate(s) in %s", removedCount, filePath))
+    return removedCount
+end
+
 function P.format_thousand(v)
     local s = string.format("%6d", math.floor(v))
     local pos = string.len(s) % 3

@@ -47,6 +47,9 @@ end
 
 local function fetchfmsFile(inUrl, inFilePath, inIsOk, inError)
     if onContentsDownloaded(inUrl, inFilePath, inIsOk, inError) then
+        if string.lower(string.sub(inFilePath, -4)) == ".fms" then
+            helpers.dedupConsecutiveFmsWaypoints(inFilePath)
+        end
         if P.OFP.values.OFP.aircraft.icao_code == 'B738' then
             local fmsZiboFilePath = definitions.XPFMSPATH .. definitions.ZIBOFILE .. ".fms"
             helpers.cp_file(inFilePath, fmsZiboFilePath) -- fms file for Zibo RC5.2+ datalink only if OFP is for B738
