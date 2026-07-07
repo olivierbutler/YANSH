@@ -40,7 +40,7 @@ P.XPUFMCSPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Custom Data" .. P.OSSE
 P.XPFMSPATH = P.XPOUTPUTPATH .. "FMS plans" .. P.OSSEPARATOR
 P.XPFMSPATHEXIST = false
 P.XPRESSOURCESPATH = sasl.getXPlanePath() .. P.OSSEPARATOR .. "Resources" .. P.OSSEPARATOR
-P.GITHUBURL = "https://raw.githubusercontent.com/olivierbutler/YANSH/main/data/modules/configuration/version.ini"
+P.GITHUBURL = "https://skunk-yansh.b-cdn.net/YANSH/data/modules/configuration/version.ini"
 P.GITHUBURLJSON = "https://api.github.com/repos/olivierbutler/YANSH/releases/latest" 
 P.SIMBRIEFURL = "https://www.simbrief.com/api/xml.fetcher.php?username=%s"
 P.SIMBRIEFOFPURL = "https://www.simbrief.com/system/briefing.fmsdl.php?formatget=flightplans/"
