@@ -16,6 +16,18 @@ local main_battery = nil
 local engine_N2_1 = globalPropertyfae("sim/flightmodel2/engines/N2_percent",1)
 local engine_N2_2 = globalPropertyfae("sim/flightmodel2/engines/N2_percent",2)
 
+local ziboPluginSignatures = {
+    "zibomod.by.Zibo"
+}
+
+local ziboTailnumPrefixes = {
+    "ZB738", -- Zibo 737-800
+    "B736",  -- LevelUp 737-600NG
+    "B737",  -- LevelUp 737-700NG
+    "B738",  -- LevelUp 737-800NG
+    "B739"   -- LevelUp 737-900/900ER
+}
+
 function P.isOnGround()
     return (get(ground_speed) < 5)
 end
@@ -27,10 +39,33 @@ function P.isFMConPower()
     return (get(main_bus) > 0) and (get(main_battery) > 0)
 end
 
+local function isZiboPluginLoaded()
+    for i = 1, #ziboPluginSignatures, 1 do
+        if sasl.findPluginBySignature(ziboPluginSignatures[i]) ~= NO_PLUGIN_ID then
+            return true
+        end
+    end
+    return false
+end
+
+local function isZiboTailnum(tailnum)
+    if type(tailnum) ~= "string" then
+        return false
+    end
+    for i = 1, #ziboTailnumPrefixes, 1 do
+        local prefix = ziboTailnumPrefixes[i]
+        if string.sub(tailnum, 1, string.len(prefix)) == prefix then
+            return true
+        end
+    end
+    return false
+end
+
 function P.initTailNum()
-    P.isZibo = (string.sub(get(acf_tailnum), 1, 5) == "ZB738")
+    local tailnum = get(acf_tailnum)
+    P.isZibo = isZiboPluginLoaded() and isZiboTailnum(tailnum)
     if P.isZibo then
-        sasl.logDebug("is zibo YES ->" .. string.sub(get(acf_tailnum), 1, 5) .. "<-")
+        sasl.logDebug("is zibo YES ->" .. tostring(tailnum) .. "<-")
         main_bus = globalProperty("laminar/B738/electric/main_bus")
         main_battery = globalProperty("laminar/B738/electric/battery_pos")
     else 
