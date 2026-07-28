@@ -21,11 +21,11 @@ local ziboPluginSignatures = {
 }
 
 local ziboTailnumPrefixes = {
-    "ZB738", -- Zibo 737-800
-    "B736",  -- LevelUp 737-600NG
-    "B737",  -- LevelUp 737-700NG
-    "B738",  -- LevelUp 737-800NG
-    "B739"   -- LevelUp 737-900/900ER
+    { prefix = "ZB738", aircraftCode = "B738" }, -- Zibo 737-800
+    { prefix = "B736", aircraftCode = "B736" },  -- LevelUp 737-600NG
+    { prefix = "B737", aircraftCode = "B737" },  -- LevelUp 737-700NG
+    { prefix = "B738", aircraftCode = "B738" },  -- LevelUp 737-800NG
+    { prefix = "B739", aircraftCode = "B739" }   -- LevelUp 737-900/900ER
 }
 
 function P.isOnGround()
@@ -53,12 +53,25 @@ local function isZiboTailnum(tailnum)
         return false
     end
     for i = 1, #ziboTailnumPrefixes, 1 do
-        local prefix = ziboTailnumPrefixes[i]
+        local prefix = ziboTailnumPrefixes[i].prefix
         if string.sub(tailnum, 1, string.len(prefix)) == prefix then
             return true
         end
     end
     return false
+end
+
+local function ziboAircraftCodeForTailnum(tailnum)
+    if type(tailnum) ~= "string" then
+        return ""
+    end
+    for i = 1, #ziboTailnumPrefixes, 1 do
+        local entry = ziboTailnumPrefixes[i]
+        if string.sub(tailnum, 1, string.len(entry.prefix)) == entry.prefix then
+            return entry.aircraftCode
+        end
+    end
+    return ""
 end
 
 function P.initTailNum()
@@ -150,6 +163,61 @@ local function normalizeOFPField(value, fieldName)
     return ""
 end
 
+local function normalizeAircraftCode(value, fieldName)
+    local text = string.upper(normalizeOFPField(value, fieldName))
+    text = string.gsub(text, "[^%w]", "")
+    if text == "" then
+        return ""
+    end
+    if text == "736" or text == "B736" or string.find(text, "737600", 1, true) then
+        return "B736"
+    end
+    if text == "737" or text == "73G" or text == "B737" or string.find(text, "737700", 1, true) then
+        return "B737"
+    end
+    if text == "738" or text == "73H" or text == "73W" or text == "B738" or string.find(text, "737800", 1, true) then
+        return "B738"
+    end
+    if text == "739" or text == "73J" or text == "B739" or string.find(text, "737900", 1, true) then
+        return "B739"
+    end
+    return text
+end
+
+local function simbriefAircraftCode(ofpData)
+    if type(ofpData) ~= "table" or type(ofpData.aircraft) ~= "table" then
+        return ""
+    end
+
+    local aircraft = ofpData.aircraft
+    local candidates = {
+        { value = aircraft.icao_code, field = "aircraft.icao_code" },
+        { value = aircraft.icaocode, field = "aircraft.icaocode" },
+        { value = aircraft.base_type, field = "aircraft.base_type" },
+        { value = aircraft.list_type, field = "aircraft.list_type" },
+        { value = aircraft.iata_code, field = "aircraft.iata_code" },
+        { value = aircraft.iatacode, field = "aircraft.iatacode" },
+        { value = aircraft.name, field = "aircraft.name" }
+    }
+
+    for i = 1, #candidates, 1 do
+        local code = normalizeAircraftCode(candidates[i].value, candidates[i].field)
+        if code ~= "" then
+            return code
+        end
+    end
+    return ""
+end
+
+local function simbriefAircraftTypeMatchesLoadedAircraft(ofpData)
+    local expectedCode = ziboAircraftCodeForTailnum(get(acf_tailnum))
+    local planCode = simbriefAircraftCode(ofpData)
+    if expectedCode == "" or planCode == "" then
+        return true, planCode, expectedCode
+    end
+    return planCode == expectedCode, planCode, expectedCode
+end
+
 local function is_plan_fuel_enable()
     local fuel_plan_option = globalProperty("laminar/B738/plan_fuel")
     local option_enable = get(fuel_plan_option)
@@ -176,6 +244,11 @@ function P.uploadToZiboFMC(ofpData)
         if not P.isOnGround() then
             sasl.logInfo("Zibo B737 not on ground : not computing the FMC")
             return 
+        end
+        local aircraftTypeMatches, planCode, expectedCode = simbriefAircraftTypeMatchesLoadedAircraft(ofpData)
+        if not aircraftTypeMatches then
+            sasl.logInfo(string.format("SimBrief aircraft type mismatch: plan %s, loaded %s : not computing the FMC", planCode, expectedCode))
+            return
         end
         -- find TOC
         local iTOC = ofpData.iTOC
