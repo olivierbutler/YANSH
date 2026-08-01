@@ -95,6 +95,41 @@ wdef = {
     }
 }
 
+local SB_USER_MAX_LENGTH = 16
+
+local function getClipboardText()
+    if sasl.getClipboardText then
+        return sasl.getClipboardText()
+    end
+    if sasl.getClipboardString then
+        return sasl.getClipboardString()
+    end
+    if sasl.getClipboard then
+        return sasl.getClipboard()
+    end
+    return nil
+end
+
+local function filterSbUser(raw)
+    if raw == nil or raw == "" then
+        return ""
+    end
+    return string.sub(tostring(raw):gsub("[^%w_%-]", ""), 1, SB_USER_MAX_LENGTH)
+end
+
+local function cancelSbUserEdit()
+    wdef.sbUser.value = tostring(settings.appSettings.sbuser or "")
+    wdef.sbUser.isFocused = false
+end
+
+local function saveSbUser(value)
+    local filtered = filterSbUser(value)
+    wdef.sbUser.value = filtered
+    wdef.sbUser.isFocused = false
+    settings.appSettings.sbuser = filtered
+    settings.writeSettings(settings.appSettings)
+end
+
 components = {interactive {
     position = {wdef.ziboFmc.x, wdef.ziboFmc.y, wdef.ziboFmc.w, wdef.ziboFmc.h}, -- FMC uplink auto FMC
     cursor = definitions.cursor,
@@ -154,19 +189,26 @@ components = {interactive {
     position = {wdef.closeButton.x, wdef.closeButton.y, wdef.closeButton.w, wdef.closeButton.h}, -- Close the window
     cursor = definitions.cursor,
     onMouseDown = function()
+        cancelSbUserEdit()
         interactive_datapanel:setIsVisible(true)
         setup_datapanel:setIsVisible(false)
+    end
+}, interactive {
+    position = {wdef.sbUser.x, wdef.sbUser.y, wdef.sbUser.w, wdef.sbUser.h}, -- simbrief user text input
+    cursor = definitions.cursor,
+    onMouseDown = function()
+        wdef.sbUser.value = tostring(settings.appSettings.sbuser or "")
+        wdef.sbUser.isFocused = true
+        return true
     end
 }, interactive {
     position = {wdef.sbUserPaste.x, wdef.sbUserPaste.y, wdef.sbUserPaste.w, wdef.sbUserPaste.h}, -- simbrief user field paste button
     cursor = definitions.cursor,
     onMouseDown = function(component, x, y, button, parentX, parentY)
-        local paste = sasl.getClipboardText()
+        local paste = getClipboardText()
         if paste ~= nil and paste ~= "" then
             sasl.logDebug(string.format("Paste Sb UserName %s", paste))
-            wdef.sbUser.value = paste
-            settings.appSettings.sbuser = paste
-            settings.writeSettings(settings.appSettings)
+            saveSbUser(paste)
         end
     end
 
@@ -179,6 +221,45 @@ function update()
     -- There are lots of ways to write this sort of thing.  The important thing is to write it in a way that
     -- you can easily understand later.  (Don't forget comments)
 
+end
+
+function onKeyDown(component, char, vkey, shift, ctrl, alt)
+    if not wdef.sbUser.isFocused then
+        return false
+    end
+
+    if char == SASL_KEY_ESCAPE then
+        cancelSbUserEdit()
+        return true
+    elseif char == SASL_KEY_RETURN then
+        saveSbUser(wdef.sbUser.value)
+        return true
+    elseif char == 8 then -- backspace
+        if #wdef.sbUser.value > 0 then
+            wdef.sbUser.value = string.sub(wdef.sbUser.value, 1, #wdef.sbUser.value - 1)
+        end
+        return true
+    end
+
+    local ctrlDown = ctrl == true or ctrl == 1
+    if ctrlDown and (char == 22 or char == 86 or char == 118 or vkey == 86) then
+        local paste = getClipboardText()
+        if paste ~= nil then
+            wdef.sbUser.value = filterSbUser(paste)
+        end
+        return true
+    end
+
+    if char ~= nil then
+        local isAlphaNum = (char >= 48 and char <= 57) or (char >= 65 and char <= 90) or (char >= 97 and char <= 122)
+        local isExtra = char == 45 or char == 95
+        if (isAlphaNum or isExtra) and #wdef.sbUser.value < SB_USER_MAX_LENGTH then
+            wdef.sbUser.value = wdef.sbUser.value .. string.char(char)
+            return true
+        end
+    end
+
+    return false
 end
 
 function draw()
