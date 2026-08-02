@@ -22,7 +22,7 @@ definitions = P -- package name
 -- P.VERSION = "3.17" -- Harden FMC flight number and cruise altitude  
 -- P.VERSION = "3.18" -- Fix crash in FMC flight-number handling when OFP fields are non-string
 -- P.VERSION = "3.19" -- Fix crash in FMC flight-number handling when OFP fields are non-string
-P.VERSION = "3.19" -- add username simbrief input instead of paste
+P.VERSION = "3.19"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
