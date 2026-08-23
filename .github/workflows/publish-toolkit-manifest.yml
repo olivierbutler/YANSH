@@ -1,0 +1,101 @@
+name: Publish Toolkit Manifest
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/publish-toolkit-manifest.yml"
+      - "tools/generate_toolkit_manifest.py"
+      - "tests/test_generate_toolkit_manifest.py"
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing YANSH release tag to augment, for example 3.19
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test manifest generator
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: python3 -m unittest discover -s tests -p 'test_generate_toolkit_manifest.py' -v
+
+  publish:
+    name: Attach manifest to official release
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
+      DISPATCH_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Resolve and download official release archive
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            tag="$RELEASE_EVENT_TAG"
+          else
+            tag="$DISPATCH_TAG"
+          fi
+
+          if [[ ! "$tag" =~ ^v?[0-9]+([.][0-9A-Za-z-]+)*$ ]]; then
+            echo "Unsupported release tag: $tag" >&2
+            exit 1
+          fi
+
+          version="${tag#v}"
+          archive="YANSH_${version}.zip"
+          metadata="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft,isPrerelease,assets)"
+          if [[ "$(jq -r '.isDraft' <<<"$metadata")" != "false" ]]; then
+            echo "Draft releases cannot be published to the Toolkit." >&2
+            exit 1
+          fi
+          if [[ "$(jq --arg name "$archive" '[.assets[].name | select(. == $name)] | length' <<<"$metadata")" != "1" ]]; then
+            echo "Expected exactly one official release asset named $archive." >&2
+            exit 1
+          fi
+
+          channel=stable
+          if [[ "$(jq -r '.isPrerelease' <<<"$metadata")" == "true" ]]; then
+            channel=beta
+          fi
+
+          mkdir -p artifacts
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "$archive" --dir artifacts
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "archive=artifacts/$archive" >> "$GITHUB_OUTPUT"
+          echo "manifest=artifacts/YANSH-${version}-manifest.json" >> "$GITHUB_OUTPUT"
+
+      - name: Generate manifest from official release archive
+        run: |
+          python3 tools/generate_toolkit_manifest.py \
+            --archive "${{ steps.release.outputs.archive }}" \
+            --release-tag "${{ steps.release.outputs.tag }}" \
+            --channel "${{ steps.release.outputs.channel }}" \
+            --output "${{ steps.release.outputs.manifest }}"
+
+      - name: Attach manifest to official release
+        run: |
+          gh release upload "${{ steps.release.outputs.tag }}" \
+            "${{ steps.release.outputs.manifest }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber
