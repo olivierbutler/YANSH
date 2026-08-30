@@ -82,13 +82,13 @@ wdef = {
         value = settings.appSettings.sbuser,
         x = 10,
         y = hSize - 60,
-        w = 200,
+        w = 300,
         h = definitions.lineHeight * 1.5,
         isFocused = false
     },
     sbUserPaste = {
         t = messages.translation['PASTE'],
-        x = 400,
+        x = 500,
         y = hSize - 60,
         w = 120,
         h = definitions.buttonHeight
