@@ -95,7 +95,7 @@ wdef = {
     }
 }
 
-local SB_USER_MAX_LENGTH = 16
+local SB_USER_MAX_LENGTH = 32
 
 local function getClipboardText()
     if sasl.getClipboardText then

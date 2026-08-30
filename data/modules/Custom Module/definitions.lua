@@ -22,7 +22,8 @@ definitions = P -- package name
 -- P.VERSION = "3.17" -- Harden FMC flight number and cruise altitude  
 -- P.VERSION = "3.18" -- Fix crash in FMC flight-number handling when OFP fields are non-string
 -- P.VERSION = "3.19" -- Allow direct SimBrief username entry
-P.VERSION = "3.19"
+-- P.VERSION = "3.20" -- SimBrief username length up to 32 char
+P.VERSION = "3.20"
 
 ----------------------------------------------
 -- DO NOT TOUCH BELOW
